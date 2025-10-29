@@ -27,7 +27,7 @@ class ImageStorageManager {
         }
     }
     
-    // 保存头像图片
+    // 保存头像图片（同步版本，保持向后兼容）
     func saveAvatar(_ image: UIImage, for memberID: UUID) -> String? {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else { return nil }
         
@@ -41,6 +41,24 @@ class ImageStorageManager {
             print("Failed to save avatar: \(error)")
             return nil
         }
+    }
+    
+    // 异步保存头像图片（推荐使用，不阻塞UI）
+    func saveAvatarAsync(_ image: UIImage, for memberID: UUID) async -> String? {
+        return await Task.detached(priority: .userInitiated) {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { return nil }
+            
+            let filename = "\(memberID.uuidString).jpg"
+            let fileURL = self.avatarsDirectory.appendingPathComponent(filename)
+            
+            do {
+                try imageData.write(to: fileURL)
+                return filename
+            } catch {
+                print("Failed to save avatar: \(error)")
+                return nil
+            }
+        }.value
     }
     
     // 加载头像图片

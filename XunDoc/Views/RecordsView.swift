@@ -410,12 +410,199 @@ struct RecordCardView: View {
         // 更新目标记录
         healthDataManager.updateHealthRecord(updatedTarget)
         
+        // 🆕 如果目标记录是已归档的，触发AI分析更新
+        if targetRecord.isArchived {
+            print("🤖 合并到已归档记录，触发AI分析更新...")
+            triggerAIAnalysisForRecord(updatedTarget)
+        }
+        
         // 删除源记录
         healthDataManager.deleteHealthRecord(record)
     }
     
+    // 🆕 为指定记录触发AI分析
+    private func triggerAIAnalysisForRecord(_ targetRecord: HealthRecord) {
+        // 构建报告上下文
+        var context = ""
+        context += "医院：\(targetRecord.hospitalName)\n"
+        context += "科室：\(targetRecord.department)\n"
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        context += "就诊日期：\(formatter.string(from: targetRecord.date))\n\n"
+        
+        // 提取照片中的文字（OCR）
+        if !targetRecord.attachments.isEmpty {
+            context += "【报告照片内容】\n"
+            for (index, imageData) in targetRecord.attachments.enumerated() {
+                let ocrText = extractTextFromImage(imageData)
+                if !ocrText.isEmpty && ocrText != "图片中未识别到文字，请确保照片清晰" {
+                    context += "报告\(index + 1)：\n\(ocrText)\n\n"
+                }
+            }
+        }
+        
+        if !targetRecord.symptoms.isEmpty && targetRecord.symptoms != "待补充" && !targetRecord.symptoms.contains("报告照片") {
+            context += "症状：\(targetRecord.symptoms)\n\n"
+        }
+        
+        if let diagnosis = targetRecord.diagnosis, !diagnosis.isEmpty {
+            context += "诊断：\(diagnosis)\n\n"
+        }
+        
+        if let treatment = targetRecord.treatment, !treatment.isEmpty {
+            context += "治疗方案：\(treatment)\n\n"
+        }
+        
+        // 添加转录文本
+        for audio in targetRecord.audioRecordings {
+            if let transcription = audio.transcribedText, audio.isTranscribed {
+                context += "录音转录：\(transcription)\n\n"
+            }
+        }
+        
+        if let notes = targetRecord.notes, !notes.isEmpty {
+            context += "备注：\(notes)\n"
+        }
+        
+        // 计算hash
+        var hashString = "\(targetRecord.attachments.count)"
+        for imageData in targetRecord.attachments {
+            hashString += "_\(imageData.count)"
+        }
+        let hash = String(hashString.hashValue)
+        
+        let key = "ai_analysis_\(context.hashValue)"
+        let hashKey = "ai_analysis_hash_\(context.hashValue)"
+        
+        // 删除旧的分析缓存，强制重新生成
+        UserDefaults.standard.removeObject(forKey: key)
+        UserDefaults.standard.removeObject(forKey: hashKey)
+        
+        print("🔄 开始为合并后的记录生成新的AI分析...")
+        
+        let analysisPrompt = """
+        你是一位资深的医学AI助手。请仔细分析以下医疗数据，并给出专业的医学解读：
+        
+        【医疗数据】
+        \(context)
+        
+        请按以下格式详细分析，用通俗易懂的语言：
+        
+        ## 📊 异常指标分析
+        **重点**：只列出异常或需要注意的指标！正常指标无需说明。
+        - 列出所有异常指标的名称、数值和正常范围
+        - 解释每个异常指标的临床意义
+        - 说明可能的原因和影响
+        
+        ## 🩺 诊断分析
+        - 基于异常指标，分析可能的疾病或健康问题
+        - 说明诊断依据（引用具体的异常指标）
+        - 评估病情严重程度（轻度/中度/重度）
+        - 是否需要进一步检查
+        
+        ## 💊 治疗方案详细建议
+        **必须详细具体**：
+        
+        1️⃣ **药物治疗**（如报告中有处方）
+        - 每种药物的名称和作用机制
+        - 为什么需要这个药物（针对哪个问题）
+        - 具体用法用量和服用时间
+        - 可能的副作用和注意事项
+        - 用药期间的监测要求
+        
+        2️⃣ **非药物治疗**
+        - 生活方式调整（具体措施）
+        - 饮食建议（什么能吃，什么不能吃）
+        - 运动建议（什么运动合适，强度如何）
+        - 作息调整
+        
+        3️⃣ **复查计划**
+        - 多久后需要复查
+        - 需要复查哪些项目
+        - 复查的目的
+        
+        ## ⚠️ 重要提示
+        - 是否需要尽快就医（紧急程度）
+        - 特别需要注意的危险信号
+        - 日常生活中需要避免的事项
+        
+        **注意**：
+        - 正常指标无需说明，只关注异常项
+        - 治疗方案要具体到剂量、时间、方法
+        - 用简单易懂的语言，避免过多医学术语
+        - 这是详细的AI解读报告，请提供完整详细的分析
+        """
+        
+        KimiAPIManager.shared.askQuestion(
+            question: analysisPrompt,
+            context: context,
+            onUpdate: { _ in },
+            onComplete: { finalAnswer in
+                // 保存分析结果
+                UserDefaults.standard.set(finalAnswer, forKey: key)
+                UserDefaults.standard.set(hash, forKey: hashKey)
+                print("✅ 合并后的AI分析已完成并保存")
+            }
+        )
+    }
+    
     private func deleteRecord() {
         healthDataManager.deleteHealthRecord(record)
+    }
+    
+    // 从图片中提取文字（OCR）
+    private func extractTextFromImage(_ imageData: Data) -> String {
+        guard let image = UIImage(data: imageData),
+              let cgImage = image.cgImage else {
+            return ""
+        }
+        
+        var extractedText = ""
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        if #available(iOS 13.0, *) {
+            let request = VNRecognizeTextRequest { request, error in
+                guard error == nil,
+                      let observations = request.results as? [VNRecognizedTextObservation] else {
+                    semaphore.signal()
+                    return
+                }
+                
+                let recognizedStrings = observations.compactMap { observation in
+                    observation.topCandidates(1).first?.string
+                }
+                
+                extractedText = recognizedStrings.joined(separator: "\n")
+                semaphore.signal()
+            }
+            
+            request.recognitionLanguages = ["zh-Hans", "zh-Hant", "en-US"]
+            request.recognitionLevel = .accurate
+            request.usesLanguageCorrection = true
+            
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try handler.perform([request])
+                } catch {
+                    print("❌ OCR处理失败: \(error.localizedDescription)")
+                    semaphore.signal()
+                }
+            }
+            
+            // 等待OCR完成（最多3秒）
+            _ = semaphore.wait(timeout: .now() + 3)
+        }
+        
+        if extractedText.isEmpty {
+            print("⚠️ 图片中未识别到文字")
+        } else {
+            print("✅ OCR识别成功，提取了文字：\(extractedText.prefix(100))...")
+        }
+        
+        return extractedText
     }
 }
 
@@ -1142,9 +1329,6 @@ struct RecordDetailView: View {
     @State private var editedTreatment: String = ""
     @State private var editedNotes: String = ""
     
-    // 图片分析
-    @StateObject private var imageAnalyzer = ImageAnalysisManager.shared
-    @State private var analyzingImageIndex: Int? = nil
     
     private var dateString: String {
         let formatter = DateFormatter()
@@ -1376,69 +1560,32 @@ struct RecordDetailView: View {
                                         GridItem(.flexible(), spacing: 8)  // 改为3列，图片更小
                                     ], spacing: 8) {
                                         ForEach(Array(record.attachments.enumerated()), id: \.offset) { index, imageData in
-                                            ZStack(alignment: .topTrailing) {
-                                                Button(action: {
-                                                    selectedImageData = imageData
-                                                    showImageViewer = true
-                                                }) {
-                                                    if let image = UIImage(data: imageData) {
-                                                        Image(uiImage: image)
-                                                            .resizable()
-                                                            .scaledToFill()
-                                                            .frame(height: 100)  // 从150降到100
-                                                            .clipped()
-                                                            .cornerRadius(8)
-                                                    } else {
-                                                        ZStack {
-                                                            Rectangle()
-                                                                .fill(Color.secondaryBackgroundColor)
-                                                                .frame(height: 100)
-                                                                .cornerRadius(8)
-                                                            
-                                                            Image(systemName: "photo")
-                                                                .font(.system(size: 24))
-                                                                .foregroundColor(.textSecondary)
-                                                        }
-                                                    }
-                                                }
-                                                .buttonStyle(PlainButtonStyle())
-                                                
-                                                // AI分析按钮
-                                                Button(action: {
-                                                    analyzeImage(imageData, at: index)
-                                                }) {
+                                            Button(action: {
+                                                selectedImageData = imageData
+                                                showImageViewer = true
+                                            }) {
+                                                if let image = UIImage(data: imageData) {
+                                                    Image(uiImage: image)
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(height: 100)  // 从150降到100
+                                                        .clipped()
+                                                        .cornerRadius(8)
+                                                } else {
                                                     ZStack {
-                                                        Circle()
-                                                            .fill(Color.accentPrimary)
-                                                            .frame(width: 28, height: 28)
+                                                        Rectangle()
+                                                            .fill(Color.secondaryBackgroundColor)
+                                                            .frame(height: 100)
+                                                            .cornerRadius(8)
                                                         
-                                                        if analyzingImageIndex == index {
-                                                            ProgressView()
-                                                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                                                .scaleEffect(0.6)
-                                                        } else {
-                                                            Image(systemName: "sparkles")
-                                                                .font(.system(size: 12))
-                                                                .foregroundColor(.white)
-                                                        }
+                                                        Image(systemName: "photo")
+                                                            .font(.system(size: 24))
+                                                            .foregroundColor(.textSecondary)
                                                     }
                                                 }
-                                                .buttonStyle(PlainButtonStyle())
-                                                .padding(6)
                                             }
+                                            .buttonStyle(PlainButtonStyle())
                                         }
-                                    }
-                                    
-                                    // 提示
-                                    if !record.attachments.isEmpty {
-                                        HStack(spacing: 6) {
-                                            Image(systemName: "info.circle")
-                                                .font(.system(size: 12))
-                                            Text("点击右上角✨按钮，AI将自动识别医嘱或诊断书")
-                                                .font(.system(size: 11))
-                                        }
-                                        .foregroundColor(.textTertiary)
-                                        .padding(.top, 4)
                                     }
                                 }
                             }
@@ -1648,7 +1795,99 @@ struct RecordDetailView: View {
         var updatedRecord = record
         updatedRecord.isArchived = true
         healthDataManager.updateHealthRecord(updatedRecord)
+        
+        // 🆕 归档时自动触发AI分析
+        if hasAnyData {
+            print("🤖 记录已归档，自动开始生成AI分析...")
+            triggerAIAnalysisInBackground()
+        }
+        
         dismiss()
+    }
+    
+    // 🆕 在后台触发AI分析
+    private func triggerAIAnalysisInBackground() {
+        let reportContext = buildReportContext()
+        let hash = calculateAttachmentsHash()
+        
+        // 检查是否已有分析结果
+        let key = "ai_analysis_\(reportContext.hashValue)"
+        let hashKey = "ai_analysis_hash_\(reportContext.hashValue)"
+        
+        let savedAnalysis = UserDefaults.standard.string(forKey: key)
+        let savedHash = UserDefaults.standard.string(forKey: hashKey)
+        
+        // 如果没有分析结果或附件有变化，则生成新的分析
+        if savedAnalysis == nil || savedHash != hash {
+            print("🔄 开始生成新的AI分析...")
+            
+            let analysisPrompt = """
+            你是一位资深的医学AI助手。请仔细分析以下医疗数据，并给出专业的医学解读：
+            
+            【医疗数据】
+            \(reportContext)
+            
+            请按以下格式详细分析，用通俗易懂的语言：
+            
+            ## 📊 异常指标分析
+            **重点**：只列出异常或需要注意的指标！正常指标无需说明。
+            - 列出所有异常指标的名称、数值和正常范围
+            - 解释每个异常指标的临床意义
+            - 说明可能的原因和影响
+            
+            ## 🩺 诊断分析
+            - 基于异常指标，分析可能的疾病或健康问题
+            - 说明诊断依据（引用具体的异常指标）
+            - 评估病情严重程度（轻度/中度/重度）
+            - 是否需要进一步检查
+            
+            ## 💊 治疗方案详细建议
+            **必须详细具体**：
+            
+            1️⃣ **药物治疗**（如报告中有处方）
+            - 每种药物的名称和作用机制
+            - 为什么需要这个药物（针对哪个问题）
+            - 具体用法用量和服用时间
+            - 可能的副作用和注意事项
+            - 用药期间的监测要求
+            
+            2️⃣ **非药物治疗**
+            - 生活方式调整（具体措施）
+            - 饮食建议（什么能吃，什么不能吃）
+            - 运动建议（什么运动合适，强度如何）
+            - 作息调整
+            
+            3️⃣ **复查计划**
+            - 多久后需要复查
+            - 需要复查哪些项目
+            - 复查的目的
+            
+            ## ⚠️ 重要提示
+            - 是否需要尽快就医（紧急程度）
+            - 特别需要注意的危险信号
+            - 日常生活中需要避免的事项
+            
+            **注意**：
+            - 正常指标无需说明，只关注异常项
+            - 治疗方案要具体到剂量、时间、方法
+            - 用简单易懂的语言，避免过多医学术语
+            - 这是详细的AI解读报告，请提供完整详细的分析
+            """
+            
+            KimiAPIManager.shared.askQuestion(
+                question: analysisPrompt,
+                context: reportContext,
+                onUpdate: { _ in },
+                onComplete: { finalAnswer in
+                    // 保存分析结果
+                    UserDefaults.standard.set(finalAnswer, forKey: key)
+                    UserDefaults.standard.set(hash, forKey: hashKey)
+                    print("✅ AI分析已完成并保存")
+                }
+            )
+        } else {
+            print("✅ 已有AI分析结果，无需重新生成")
+        }
     }
     
     private func formatDuration(_ duration: TimeInterval) -> String {
@@ -1663,61 +1902,6 @@ struct RecordDetailView: View {
         return formatter.string(from: date)
     }
     
-    // 分析图片
-    private func analyzeImage(_ imageData: Data, at index: Int) {
-        analyzingImageIndex = index
-        
-        imageAnalyzer.analyzeImage(
-            imageData: imageData,
-            onUpdate: { partialResult in
-                print("📄 AI分析中: \(partialResult)")
-            },
-            onComplete: { result in
-                analyzingImageIndex = nil
-                
-                // 根据分析结果自动填充
-                var updatedRecord = record
-                
-                switch result.documentType {
-                case .prescription:
-                    // 医嘱/处方 - 保存到治疗方案
-                    if let treatmentPlan = result.treatmentPlan {
-                        let currentTreatment = updatedRecord.treatment ?? ""
-                        let newTreatment = currentTreatment.isEmpty ? treatmentPlan : "\(currentTreatment)\n\n\(treatmentPlan)"
-                        updatedRecord.treatment = newTreatment
-                        
-                        // 如果在编辑模式，同步更新编辑字段
-                        if isEditMode {
-                            editedTreatment = newTreatment
-                        }
-                        
-                        print("✅ 识别为医嘱，治疗方案已保存")
-                    }
-                    
-                case .diagnosis:
-                    // 诊断书 - 保存到诊断
-                    if let diagnosis = result.diagnosis {
-                        let currentDiagnosis = updatedRecord.diagnosis ?? ""
-                        let newDiagnosis = currentDiagnosis.isEmpty ? diagnosis : "\(currentDiagnosis)\n\n\(diagnosis)"
-                        updatedRecord.diagnosis = newDiagnosis
-                        
-                        // 如果在编辑模式，同步更新编辑字段
-                        if isEditMode {
-                            editedDiagnosis = newDiagnosis
-                        }
-                        
-                        print("✅ 识别为诊断书，诊断已保存")
-                    }
-                    
-                case .other:
-                    print("ℹ️ 未识别为医嘱或诊断书")
-                }
-                
-                // 保存更新
-                healthDataManager.updateHealthRecord(updatedRecord)
-            }
-        )
-    }
     
     // 保存转录结果
     private func saveTranscription(for audioId: UUID, text: String) {

@@ -209,3 +209,18 @@ struct MedicationReminder: Identifiable, Codable {
     }
 }
 
+// MARK: - 服药记录
+struct MedicationTakenRecord: Codable, Identifiable {
+    let id: UUID
+    let medicationId: UUID  // 关联的MedicationReminder的ID
+    let takenDate: Date     // 服用日期时间
+    let scheduledTime: Date // 计划服用时间
+    
+    init(id: UUID = UUID(), medicationId: UUID, takenDate: Date, scheduledTime: Date) {
+        self.id = id
+        self.medicationId = medicationId
+        self.takenDate = takenDate
+        self.scheduledTime = scheduledTime
+    }
+}
+

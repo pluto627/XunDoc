@@ -32,6 +32,7 @@ struct AddReportWithExcelView: View {
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
     @State private var compressedImageData: Data?
+    @State private var isProcessingImage = false
     
     var body: some View {
         NavigationView {
@@ -240,7 +241,38 @@ struct AddReportWithExcelView: View {
         .sheet(isPresented: $showingImagePicker) {
             ReportImagePicker(image: $selectedImage) {
                 if let image = selectedImage {
-                    compressedImageData = reportManager.compressImage(image, maxSizeKB: 500)
+                    // 异步压缩图片，避免UI卡顿
+                    isProcessingImage = true
+                    Task.detached(priority: .userInitiated) {
+                        let compressed = await compressImageAsync(image, maxSizeKB: 500)
+                        await MainActor.run {
+                            compressedImageData = compressed
+                            isProcessingImage = false
+                        }
+                    }
+                }
+            }
+        }
+        .overlay {
+            if isProcessingImage {
+                ZStack {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        
+                        Text("正在处理图片...")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.black.opacity(0.7))
+                    )
                 }
             }
         }
@@ -255,6 +287,23 @@ struct AddReportWithExcelView: View {
         let hasFile = (selectedFileType == .excel && excelData != nil) || 
                      (selectedFileType == .image && compressedImageData != nil)
         return !title.isEmpty && !hospitalName.isEmpty && hasFile
+    }
+    
+    // 异步压缩图片函数
+    private func compressImageAsync(_ image: UIImage, maxSizeKB: Int) async -> Data? {
+        return await Task.detached(priority: .userInitiated) {
+            var compression: CGFloat = 0.8
+            var imageData = image.jpegData(compressionQuality: compression)
+            let maxBytes = maxSizeKB * 1024
+            
+            // 逐步降低压缩质量直到满足大小要求
+            while let data = imageData, data.count > maxBytes && compression > 0.1 {
+                compression -= 0.1
+                imageData = image.jpegData(compressionQuality: compression)
+            }
+            
+            return imageData
+        }.value
     }
     
     private func saveReport() {

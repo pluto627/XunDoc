@@ -24,6 +24,7 @@ struct PhotoDiagnosisView: View {
     @State private var additionalNotes = ""
     @State private var errorMessage = ""
     @State private var showingError = false
+    @State private var isProcessingImage = false
     
     var body: some View {
         NavigationView {
@@ -59,9 +60,21 @@ struct PhotoDiagnosisView: View {
             }
             .sheet(isPresented: $showingImagePicker) {
                 OriginalImagePicker(image: $selectedImage, sourceType: .photoLibrary)
+                    .onChange(of: selectedImage) { newImage in
+                        if newImage != nil {
+                            // 图片选择后立即进行异步处理
+                            processImageAsync(newImage)
+                        }
+                    }
             }
             .sheet(isPresented: $showingCamera) {
                 OriginalImagePicker(image: $selectedImage, sourceType: .camera)
+                    .onChange(of: selectedImage) { newImage in
+                        if newImage != nil {
+                            // 拍照后立即进行异步处理
+                            processImageAsync(newImage)
+                        }
+                    }
             }
             .sheet(isPresented: $showingResult) {
                 if let result = analysisResult {
@@ -72,6 +85,29 @@ struct PhotoDiagnosisView: View {
                 Button(NSLocalizedString("ok", comment: "")) { }
             } message: {
                 Text(errorMessage)
+            }
+            .overlay {
+                if isProcessingImage {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            
+                            Text("正在优化图片...")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                        .padding(32)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.black.opacity(0.7))
+                        )
+                    }
+                }
             }
         }
     }
@@ -312,6 +348,44 @@ struct PhotoDiagnosisView: View {
     
     private func removeSymptom(_ symptom: String) {
         symptoms.removeAll { $0 == symptom }
+    }
+    
+    // 异步处理图片，避免UI卡顿
+    private func processImageAsync(_ image: UIImage?) {
+        guard let image = image else { return }
+        
+        isProcessingImage = true
+        Task.detached(priority: .userInitiated) {
+            // 在后台线程进行图片优化
+            let optimized = await optimizeImageForAnalysis(image)
+            
+            await MainActor.run {
+                selectedImage = optimized
+                isProcessingImage = false
+            }
+        }
+    }
+    
+    // 优化图片以便于分析（压缩和调整大小）
+    private func optimizeImageForAnalysis(_ image: UIImage) async -> UIImage {
+        return await Task.detached(priority: .userInitiated) {
+            let maxDimension: CGFloat = 1024
+            let size = image.size
+            
+            if size.width <= maxDimension && size.height <= maxDimension {
+                return image
+            }
+            
+            let scale = min(maxDimension / size.width, maxDimension / size.height)
+            let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+            
+            UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return resizedImage ?? image
+        }.value
     }
     
     private func performAnalysis() {

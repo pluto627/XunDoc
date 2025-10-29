@@ -162,7 +162,7 @@ class ImageAnalysisManager: ObservableObject {
         ]
         
         let requestBody: [String: Any] = [
-            "model": "moonshot-v1-8k",
+            "model": "moonshot-v1-32k",
             "messages": messages,
             "stream": false,
             "temperature": 0.3

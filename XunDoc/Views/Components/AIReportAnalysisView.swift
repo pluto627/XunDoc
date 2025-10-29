@@ -34,7 +34,10 @@ struct AIReportAnalysisView: View {
                         AIAnalysisSection(
                             analysis: aiAnalysis,
                             isAnalyzing: isAnalyzing,
-                            isExpanded: $isAnalysisExpanded
+                            isExpanded: $isAnalysisExpanded,
+                            onGenerate: {
+                                generateAnalysis()
+                            }
                         )
                         
                         Divider()
@@ -73,14 +76,12 @@ struct AIReportAnalysisView: View {
             loadSavedConversations()
             loadLastAnalyzedHash()
             
-            // 只在以下情况重新分析：
-            // 1. 没有保存的分析结果
-            // 2. 附件有变化（通过hash判断）
-            if aiAnalysis.isEmpty || lastAnalyzedHash != attachmentsHash {
-                print("🔄 需要重新分析（分析为空: \(aiAnalysis.isEmpty), hash变化: \(lastAnalyzedHash) -> \(attachmentsHash)）")
-                generateAnalysis()
+            // 🆕 不再自动分析，只加载已有的分析结果
+            // 分析将在用户归档记录时触发
+            if !aiAnalysis.isEmpty {
+                print("✅ 加载了已保存的AI分析结果")
             } else {
-                print("✅ 使用缓存的AI分析结果")
+                print("ℹ️ 暂无分析结果，等待用户归档后自动分析")
             }
         }
     }
@@ -260,6 +261,7 @@ struct AIAnalysisSection: View {
     let analysis: String
     let isAnalyzing: Bool
     @Binding var isExpanded: Bool
+    let onGenerate: () -> Void  // 生成分析的回调
     
     private let previewLineLimit = 5  // 折叠时显示的行数
     
@@ -294,11 +296,40 @@ struct AIAnalysisSection: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
                 } else if analysis.isEmpty {
-                    Text("暂无分析结果")
-                        .font(.system(size: 14))
-                        .foregroundColor(.textTertiary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
+                    VStack(spacing: 16) {
+                        Image(systemName: "doc.text.magnifyingglass")
+                            .font(.system(size: 32))
+                            .foregroundColor(.textTertiary.opacity(0.6))
+                        
+                        Text("AI分析生成中...")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.textSecondary)
+                        
+                        Text("归档时已自动开始分析，请稍后刷新查看")
+                            .font(.system(size: 12))
+                            .foregroundColor(.textTertiary)
+                            .multilineTextAlignment(.center)
+                        
+                        // 手动生成分析按钮（备用）
+                        Button(action: onGenerate) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 14))
+                                Text("手动生成分析")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .foregroundColor(.accentPrimary)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .stroke(Color.accentPrimary, lineWidth: 1.5)
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
                 } else {
                     // AI分析内容
                     Text(analysis)

@@ -82,7 +82,7 @@ class MoonshotAPIManager: ObservableObject {
                     ["type": "image_url", "image_url": ["url": "data:image/jpeg;base64,\(base64Image)"]]
                 ] as [[String : Any]]]
             ],
-            model: "moonshot-v1-8k-vision-preview"
+            model: "moonshot-v1-32k-vision-preview"
         )
         
         return parseSkinAnalysisResponse(response)
@@ -148,7 +148,7 @@ class MoonshotAPIManager: ObservableObject {
                 """],
                 ["role": "user", "content": prompt]
             ],
-            model: "moonshot-v1-8k"
+            model: "moonshot-v1-32k"
         )
         
         return parseSymptomAnalysisResponse(response)
@@ -220,7 +220,7 @@ class MoonshotAPIManager: ObservableObject {
                 """],
                 ["role": "user", "content": prompt]
             ],
-            model: "moonshot-v1-8k"
+            model: "moonshot-v1-32k"
         )
         
         return parseReportInterpretation(response)
@@ -292,7 +292,7 @@ class MoonshotAPIManager: ObservableObject {
                 """],
                 ["role": "user", "content": prompt]
             ],
-            model: "moonshot-v1-8k"
+            model: "moonshot-v1-32k"
         )
         
         return parseMedicationGuidance(response)

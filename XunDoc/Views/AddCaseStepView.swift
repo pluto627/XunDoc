@@ -77,15 +77,18 @@ struct AddCaseStepView: View {
                         }
                         
                         // 就诊日期
-                        VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 12) {
                             Text("就诊日期")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.textPrimary)
                             
+                            Spacer()
+                            
                             DatePicker("", selection: $visitDate, displayedComponents: .date)
                                 .datePickerStyle(.compact)
                                 .labelsHidden()
-                                .padding(14)
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 14)
                                 .background(Color.secondaryBackgroundColor)
                                 .cornerRadius(14)
                         }
@@ -396,36 +399,84 @@ struct SectionHeader: View {
 // 科室网格选择器
 struct DepartmentGridSelector: View {
     @Binding var selectedDepartment: String
+    @State private var showCustomInput = false
+    @State private var customDepartment = ""
     
-    let departments = ["内科", "外科", "儿科", "妇科", "骨科", "眼科", "耳鼻喉科", "皮肤科", "神经科", "心血管内科", "呼吸内科", "消化内科", "泌尿科", "肿瘤科", "口腔科", "中医科"]
+    let departments = ["内科", "外科", "儿科", "妇科", "骨科", "眼科", "耳鼻喉科", "皮肤科", "神经科", "心血管内科", "呼吸内科", "消化内科", "泌尿科", "肿瘤科", "口腔科", "中医科", "其他"]
+    
+    // 判断是否是预设科室
+    private var isPresetDepartment: Bool {
+        departments.contains(selectedDepartment)
+    }
     
     var body: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ], spacing: 10) {
-            ForEach(departments, id: \.self) { dept in
-                Button(action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        selectedDepartment = dept
+        VStack(spacing: 12) {
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 10) {
+                ForEach(departments, id: \.self) { dept in
+                    Button(action: {
+                        if dept == "其他" {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                showCustomInput = true
+                                if !isPresetDepartment && !selectedDepartment.isEmpty {
+                                    customDepartment = selectedDepartment
+                                }
+                            }
+                        } else {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                selectedDepartment = dept
+                                showCustomInput = false
+                            }
+                        }
+                    }) {
+                        Text(dept)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? .white : .textPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.secondaryBackgroundColor)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.clear, lineWidth: 2)
+                            )
                     }
-                }) {
-                    Text(dept)
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            
+            // 自定义科室输入框
+            if showCustomInput {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("请输入科室名称")
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(selectedDepartment == dept ? .white : .textPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(selectedDepartment == dept ? Color.accentPrimary : Color.secondaryBackgroundColor)
-                        )
+                        .foregroundColor(.textSecondary)
+                    
+                    TextField("如：疼痛科、康复科等", text: $customDepartment)
+                        .font(.system(size: 15))
+                        .foregroundColor(.textPrimary)
+                        .padding(.vertical, 14)
+                        .padding(.horizontal, 16)
+                        .background(Color.secondaryBackgroundColor)
+                        .cornerRadius(12)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .stroke(selectedDepartment == dept ? Color.accentPrimary : Color.clear, lineWidth: 2)
+                                .stroke(Color.accentPrimary, lineWidth: 2)
                         )
+                        .onChange(of: customDepartment) { newValue in
+                            selectedDepartment = newValue
+                        }
                 }
-                .buttonStyle(PlainButtonStyle())
+                .padding(.top, 4)
+                .transition(.asymmetric(
+                    insertion: .scale.combined(with: .opacity),
+                    removal: .scale.combined(with: .opacity)
+                ))
             }
         }
     }
@@ -484,8 +535,15 @@ struct CaseStep1HospitalView: View {
 struct CaseStep2DepartmentView: View {
     @Binding var department: String
     @Binding var visitDate: Date
+    @State private var showCustomInput = false
+    @State private var customDepartment = ""
     
-    let departments = ["内科", "外科", "儿科", "妇科", "骨科", "眼科", "耳鼻喉科", "皮肤科", "神经科", "心血管内科", "呼吸内科", "消化内科", "泌尿科", "肿瘤科", "口腔科", "中医科"]
+    let departments = ["内科", "外科", "儿科", "妇科", "骨科", "眼科", "耳鼻喉科", "皮肤科", "神经科", "心血管内科", "呼吸内科", "消化内科", "泌尿科", "肿瘤科", "口腔科", "中医科", "其他"]
+    
+    // 判断是否是预设科室
+    private var isPresetDepartment: Bool {
+        departments.contains(department)
+    }
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -502,15 +560,18 @@ struct CaseStep2DepartmentView: View {
                 .padding(.top, 40)
                 
                 // 日期选择 - 放在科室上面
-                VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 12) {
                     Text("就诊日期")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.textPrimary)
                     
+                    Spacer()
+                    
                     DatePicker("", selection: $visitDate, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
-                        .padding(14)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 14)
                         .background(Color.secondaryBackgroundColor)
                         .cornerRadius(14)
                 }
@@ -528,26 +589,65 @@ struct CaseStep2DepartmentView: View {
                     ], spacing: 10) {
                         ForEach(departments, id: \.self) { dept in
                             Button(action: {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    department = dept
+                                if dept == "其他" {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        showCustomInput = true
+                                        if !isPresetDepartment && !department.isEmpty {
+                                            customDepartment = department
+                                        }
+                                    }
+                                } else {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        department = dept
+                                        showCustomInput = false
+                                    }
                                 }
                             }) {
                                 Text(dept)
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(department == dept ? .white : .textPrimary)
+                                    .foregroundColor((department == dept || (dept == "其他" && showCustomInput)) ? .white : .textPrimary)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                            .fill(department == dept ? Color.accentPrimary : Color.secondaryBackgroundColor)
+                                            .fill((department == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.secondaryBackgroundColor)
                                     )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                            .stroke(department == dept ? Color.accentPrimary : Color.clear, lineWidth: 2)
+                                            .stroke((department == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.clear, lineWidth: 2)
                                     )
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
+                    }
+                    
+                    // 自定义科室输入框
+                    if showCustomInput {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("请输入科室名称")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.textSecondary)
+                            
+                            TextField("如：疼痛科、康复科等", text: $customDepartment)
+                                .font(.system(size: 15))
+                                .foregroundColor(.textPrimary)
+                                .padding(.vertical, 14)
+                                .padding(.horizontal, 16)
+                                .background(Color.secondaryBackgroundColor)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(Color.accentPrimary, lineWidth: 2)
+                                )
+                                .onChange(of: customDepartment) { newValue in
+                                    department = newValue
+                                }
+                        }
+                        .padding(.top, 4)
+                        .transition(.asymmetric(
+                            insertion: .scale.combined(with: .opacity),
+                            removal: .scale.combined(with: .opacity)
+                        ))
                     }
                 }
             }

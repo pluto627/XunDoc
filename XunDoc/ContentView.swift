@@ -102,9 +102,13 @@ struct ContentView: View {
         .environment(\.locale, languageManager.currentLanguage.locale)
         .accentColor(Color(red: 55/255, green: 53/255, blue: 47/255))
         .onAppear {
-            // 请求通知权限
+            // 请求通知权限并同步药物通知
             Task {
-                await notificationManager.requestNotificationPermission()
+                let granted = await notificationManager.requestNotificationPermission()
+                if granted {
+                    // 权限获取成功后，同步所有活跃药物的通知
+                    await healthDataManager.syncAllMedicationNotifications()
+                }
             }
             
             // 检查是否需要显示首次引导
@@ -127,9 +131,9 @@ struct ContentView: View {
                 .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingMedication) {
-            AddMedicationView(isPresented: $showingMedication)
+            AddMedicationFormView(isPresented: $showingMedication)
                 .environmentObject(healthDataManager)
-                .presentationDetents([.large])
+                .presentationDetents([.height(650), .large])
                 .presentationDragIndicator(.visible)
         }
         .fullScreenCover(isPresented: $showingOnboarding) {
@@ -137,6 +141,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 #Preview {
     ContentView()

@@ -474,8 +474,8 @@ struct MedicationModalWrapper: View {
             VStack {
                 Spacer()
                 if showMedicationPanel {
-                    // 使用快捷添加视图替代标准添加视图
-                    QuickAddMedicationView(isPresented: $showMedicationPanel)
+                    // 使用新的表单视图
+                    AddMedicationFormView(isPresented: $showMedicationPanel)
                         .environmentObject(HealthDataManager.shared)
                         .transition(.move(edge: .bottom))
                         .onChange(of: showMedicationPanel) { newValue in
@@ -823,33 +823,55 @@ struct SimpleRecordingSheet: View {
     private func generateAIDiagnosisFromAudio(transcription: String, audioRecording: HealthRecord.AudioRecording, title: String) {
         print("🤖 开始基于音频转录生成AI诊断...")
         
+        // 🆕 先创建记录，显示"生成中..."
+        let record = HealthRecord(
+            hospitalName: "待补充",
+            department: "待补充",
+            date: Date(),
+            symptoms: title,
+            diagnosis: "AI分析中，请稍候...",
+            treatment: nil,
+            attachments: [],
+            audioRecordings: [audioRecording],
+            notes: "正在生成AI诊断和治疗方案...",
+            isArchived: false,
+            recordType: .outpatient
+        )
+        
+        healthDataManager.addHealthRecord(record)
+        let recordId = record.id
+        
+        print("✅ 录音记录已保存，开始后台生成AI诊断")
+        
+        // 立即关闭面板，不阻塞用户
+        DispatchQueue.main.async {
+            self.isPresented = false
+        }
+        
+        // 后台生成AI诊断
         let analysisPrompt = """
         你是一位资深的医学AI助手。请基于以下医患对话录音的转录文本，给出专业的医学分析：
         
         【对话录音转录】
         \(transcription)
         
-        ⚠️ 注意：这是仅基于录音的分析，没有检查报告数据支持，请标注为"参考诊断"。
+        请按照以下格式输出（使用指定的标记符）：
         
-        请详细分析：
+        [诊断]
+        给出30字以内的简短诊断，例如：初步诊断：急性上呼吸道感染（感冒）
+        [/诊断]
         
-        ## 🩺 参考诊断
-        （标注：仅基于对话，无检查报告支持）
-        - 根据对话内容，分析可能的疾病
-        - 说明诊断依据（引用对话中的症状描述）
-        - 评估可信度（低/中/高）
+        [治疗方案]
+        详细的治疗建议，包括：
+        1. 药物治疗（如对话中有提到）：药名、用法、用量
+        2. 非药物治疗：饮食、休息、注意事项
+        3. 复查建议
+        [/治疗方案]
         
-        ## 💊 建议的治疗方案
-        - 如果对话中提到了处方，详细解释
-        - 如果没有，根据症状给出治疗建议
-        - 具体到药物、剂量、服用方法
-        
-        ## ⚠️ 重要提示
-        - 是否需要进一步检查（列出具体检查项目）
-        - 需要注意的危险信号
-        - 复查建议
-        
-        请用通俗易懂的语言，让患者能够理解。
+        注意：
+        - 诊断部分必须简短（30字内）
+        - 治疗方案要详细具体
+        - 必须使用[诊断][/诊断]和[治疗方案][/治疗方案]标记
         """
         
         KimiAPIManager.shared.askQuestion(
@@ -861,26 +883,23 @@ struct SimpleRecordingSheet: View {
             onComplete: { finalAnswer in
                 print("✅ AI诊断生成完成")
                 
-                // 创建包含AI诊断的记录
+                // 解析诊断和治疗方案
+                let diagnosis = self.extractSection(from: finalAnswer, tag: "诊断") ?? finalAnswer
+                let treatment = self.extractSection(from: finalAnswer, tag: "治疗方案")
+                
+                // 更新记录
                 DispatchQueue.main.async {
-                    let record = HealthRecord(
-                        hospitalName: "待补充",
-                        department: "待补充",
-                        date: Date(),
-                        symptoms: title,
-                        diagnosis: "⚠️ 参考诊断（仅基于录音对话）\n\n" + finalAnswer,
-                        treatment: "详见上方AI分析",
-                        attachments: [],
-                        audioRecordings: [audioRecording],
-                        notes: "此诊断仅基于录音转录，建议上传检查报告以获得更准确的分析。",
-                        isArchived: false,
-                        recordType: .outpatient
-                    )
-                    
-                    self.healthDataManager.addHealthRecord(record)
-                    
-                    print("✅ 带AI诊断的录音记录已保存")
-                    self.isPresented = false
+                    if var updatedRecord = self.healthDataManager.healthRecords.first(where: { $0.id == recordId }) {
+                        updatedRecord.diagnosis = diagnosis
+                        updatedRecord.treatment = treatment
+                        updatedRecord.notes = "此诊断基于录音转录，归档后可查看更详细的AI分析"
+                        
+                        self.healthDataManager.updateHealthRecord(updatedRecord)
+                        
+                        print("✅ AI诊断已更新到记录")
+                        print("   诊断: \(diagnosis)")
+                        print("   治疗: \(treatment ?? "无")")
+                    }
                 }
             }
         )
@@ -911,6 +930,27 @@ struct SimpleRecordingSheet: View {
             print("🗑️ 清理临时录音文件")
         }
     }
+    
+    // 从AI返回的文本中提取指定标记的内容
+    private func extractSection(from text: String, tag: String) -> String? {
+        let startTag = "[\(tag)]"
+        let endTag = "[/\(tag)]"
+        
+        guard let startRange = text.range(of: startTag),
+              let endRange = text.range(of: endTag) else {
+            return nil
+        }
+        
+        let contentStart = text.index(startRange.upperBound, offsetBy: 0)
+        let contentEnd = endRange.lowerBound
+        
+        guard contentStart < contentEnd else {
+            return nil
+        }
+        
+        let content = String(text[contentStart..<contentEnd])
+        return content.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 // MARK: - 图片包装器（用于识别）
@@ -927,6 +967,7 @@ struct SimpleReportSheet: View {
     @State private var showingImagePicker = false
     @State private var showingCamera = false
     @State private var tempImages: [UIImage] = []
+    @State private var isProcessingImages = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -1108,16 +1149,57 @@ struct SimpleReportSheet: View {
         .background(Color.appBackgroundColor)
         .sheet(isPresented: $showingImagePicker) {
             if #available(iOS 14.0, *) {
-                MultipleImagePicker(images: $tempImages, maxSelection: 10)
-                    .onDisappear {
-                        // 将新选择的图片包装成 IdentifiableImage
-                        let newImages = tempImages.map { IdentifiableImage(image: $0) }
-                        selectedImages.append(contentsOf: newImages)
-                        tempImages.removeAll()
+                ZStack {
+                    MultipleImagePicker(images: $tempImages, maxSelection: 10)
+                        .onDisappear {
+                            if !tempImages.isEmpty {
+                                // 异步处理新选择的图片，避免UI卡顿
+                                Task {
+                                    await processNewImages()
+                                }
+                            }
+                        }
+                    
+                    // 显示处理进度
+                    if isProcessingImages {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            
+                            Text("正在处理图片...")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                        .padding(32)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.black.opacity(0.7))
+                        )
                     }
+                }
             } else {
                 Text("批量选择需要 iOS 14 或更高版本")
             }
+        }
+    }
+    
+    // 异步处理新选择的图片
+    private func processNewImages() async {
+        await MainActor.run {
+            isProcessingImages = true
+        }
+        
+        // 将新选择的图片包装成 IdentifiableImage
+        let newImages = tempImages.map { IdentifiableImage(image: $0) }
+        
+        await MainActor.run {
+            selectedImages.append(contentsOf: newImages)
+            tempImages.removeAll()
+            isProcessingImages = false
         }
     }
     
@@ -1220,37 +1302,56 @@ struct SimpleReportSheet: View {
     private func generateAIDiagnosisFromReport(reportText: String, attachments: [Data]) {
         print("🤖 开始基于报告生成AI诊断...")
         
+        // 🆕 先创建记录，显示"生成中..."
+        let record = HealthRecord(
+            hospitalName: "待补充",
+            department: "待补充",
+            date: Date(),
+            symptoms: "报告照片 (\(attachments.count)张)",
+            diagnosis: "AI分析中，请稍候...",
+            treatment: nil,
+            attachments: attachments,
+            audioRecordings: [],
+            notes: "正在生成AI诊断和治疗方案...",
+            isArchived: false,
+            recordType: .physical
+        )
+        
+        healthDataManager.addHealthRecord(record)
+        let recordId = record.id
+        
+        print("✅ 报告记录已保存，开始后台生成AI诊断")
+        
+        // 立即关闭面板，不阻塞用户
+        DispatchQueue.main.async {
+            self.isPresented = false
+        }
+        
+        // 后台生成AI诊断
         let analysisPrompt = """
         你是一位资深的医学AI助手。请基于以下检查报告内容，给出专业的医学分析：
         
         【检查报告内容】
         \(reportText)
         
-        ⚠️ 注意：这是仅基于检查报告的分析，没有患者症状描述和录音对话，请标注为"参考诊断"。
+        请按照以下格式输出（使用指定的标记符）：
         
-        请详细分析：
+        [诊断]
+        给出30字以内的简短诊断，例如：血常规正常，肝功能轻度异常，建议复查
+        [/诊断]
         
-        ## 📊 异常指标分析
-        - 只列出异常或需要注意的指标
-        - 解释每个异常指标的临床意义
+        [治疗方案]
+        详细的治疗建议，包括：
+        1. 针对异常指标的处理建议
+        2. 生活方式调整：饮食、运动、作息
+        3. 用药建议（如需要）
+        4. 复查计划和注意事项
+        [/治疗方案]
         
-        ## 🩺 参考诊断
-        （标注：仅基于检查报告，无症状描述）
-        - 根据报告数据，分析可能的疾病
-        - 说明诊断依据
-        - 评估病情严重程度
-        
-        ## 💊 建议的治疗方案
-        - 详细的治疗建议
-        - 具体到药物、剂量、服用方法
-        - 非药物治疗建议
-        
-        ## ⚠️ 重要提示
-        - 是否需要进一步检查
-        - 需要注意的事项
-        - 复查建议
-        
-        请用通俗易懂的语言，让患者能够理解。
+        注意：
+        - 诊断部分必须简短（30字内）
+        - 治疗方案要详细具体
+        - 必须使用[诊断][/诊断]和[治疗方案][/治疗方案]标记
         """
         
         KimiAPIManager.shared.askQuestion(
@@ -1262,29 +1363,47 @@ struct SimpleReportSheet: View {
             onComplete: { finalAnswer in
                 print("✅ AI诊断生成完成")
                 
-                // 创建包含AI诊断的记录
+                // 解析诊断和治疗方案
+                let diagnosis = self.extractSection(from: finalAnswer, tag: "诊断") ?? finalAnswer
+                let treatment = self.extractSection(from: finalAnswer, tag: "治疗方案")
+                
+                // 更新记录
                 DispatchQueue.main.async {
-                    let record = HealthRecord(
-                        hospitalName: "待补充",
-                        department: "待补充",
-                        date: Date(),
-                        symptoms: "报告照片 (\(attachments.count)张)",
-                        diagnosis: "⚠️ 参考诊断（仅基于检查报告）\n\n" + finalAnswer,
-                        treatment: "详见上方AI分析",
-                        attachments: attachments,
-                        audioRecordings: [],
-                        notes: "此诊断仅基于检查报告，建议补充症状描述以获得更准确的分析。",
-                        isArchived: false,
-                        recordType: .physical
-                    )
-                    
-                    self.healthDataManager.addHealthRecord(record)
-                    
-                    print("✅ 带AI诊断的报告记录已保存")
-                    self.isPresented = false
+                    if var updatedRecord = self.healthDataManager.healthRecords.first(where: { $0.id == recordId }) {
+                        updatedRecord.diagnosis = diagnosis
+                        updatedRecord.treatment = treatment
+                        updatedRecord.notes = "此诊断基于检查报告，归档后可查看更详细的AI分析"
+                        
+                        self.healthDataManager.updateHealthRecord(updatedRecord)
+                        
+                        print("✅ AI诊断已更新到记录")
+                        print("   诊断: \(diagnosis)")
+                        print("   治疗: \(treatment ?? "无")")
+                    }
                 }
             }
         )
+    }
+    
+    // 🆕 从AI返回的文本中提取指定标记的内容
+    private func extractSection(from text: String, tag: String) -> String? {
+        let startTag = "[\(tag)]"
+        let endTag = "[/\(tag)]"
+        
+        guard let startRange = text.range(of: startTag),
+              let endRange = text.range(of: endTag) else {
+            return nil
+        }
+        
+        let contentStart = text.index(startRange.upperBound, offsetBy: 0)
+        let contentEnd = endRange.lowerBound
+        
+        guard contentStart < contentEnd else {
+            return nil
+        }
+        
+        let content = String(text[contentStart..<contentEnd])
+        return content.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // 🆕 保存没有诊断的报告

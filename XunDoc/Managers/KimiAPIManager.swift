@@ -29,7 +29,7 @@ struct KimiChatRequest: Codable {
     }
     
     init(messages: [KimiChatMessage], stream: Bool = false, temperature: Double = 0.7, maxTokens: Int? = nil) {
-        self.model = "moonshot-v1-8k"  // 或使用 moonshot-v1-32k, moonshot-v1-128k
+        self.model = "moonshot-v1-32k"  // 或使用 moonshot-v1-32k, moonshot-v1-128k
         self.messages = messages
         self.stream = stream
         self.temperature = temperature

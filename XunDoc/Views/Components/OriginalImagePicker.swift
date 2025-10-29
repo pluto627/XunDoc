@@ -89,27 +89,70 @@ struct MultipleImagePicker: UIViewControllerRepresentable {
             
             guard !results.isEmpty else { return }
             
-            var loadedImages: [UIImage] = []
-            let group = DispatchGroup()
-            
-            for result in results {
-                group.enter()
+            // 使用后台线程异步处理图片，避免UI卡顿
+            Task.detached(priority: .userInitiated) {
+                var loadedImages: [UIImage] = []
                 
-                result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
-                    defer { group.leave() }
+                // 并发加载和优化图片
+                await withTaskGroup(of: UIImage?.self) { group in
+                    for result in results {
+                        group.addTask {
+                            await self.loadAndOptimizeImage(from: result)
+                        }
+                    }
                     
+                    for await image in group {
+                        if let image = image {
+                            loadedImages.append(image)
+                        }
+                    }
+                }
+                
+                await MainActor.run {
+                    self.parent.images = loadedImages
+                    print("✅ 成功加载并优化 \(loadedImages.count) 张图片")
+                }
+            }
+        }
+        
+        // 异步加载和优化图片
+        private func loadAndOptimizeImage(from result: PHPickerResult) async -> UIImage? {
+            return await withCheckedContinuation { continuation in
+                result.itemProvider.loadObject(ofClass: UIImage.self) { (object, error) in
                     if let image = object as? UIImage {
-                        loadedImages.append(image)
-                    } else if let error = error {
-                        print("❌ 加载图片失败: \(error.localizedDescription)")
+                        // 在后台优化图片
+                        let optimized = self.optimizeImage(image)
+                        continuation.resume(returning: optimized)
+                    } else {
+                        if let error = error {
+                            print("❌ 加载图片失败: \(error.localizedDescription)")
+                        }
+                        continuation.resume(returning: nil)
                     }
                 }
             }
+        }
+        
+        // 优化图片大小和质量
+        private func optimizeImage(_ image: UIImage) -> UIImage {
+            let maxDimension: CGFloat = 2048 // 最大尺寸
+            let size = image.size
             
-            group.notify(queue: .main) {
-                self.parent.images = loadedImages
-                print("✅ 成功加载 \(loadedImages.count) 张图片")
+            // 如果图片已经足够小，直接返回
+            if size.width <= maxDimension && size.height <= maxDimension {
+                return image
             }
+            
+            // 按比例缩放
+            let scale = min(maxDimension / size.width, maxDimension / size.height)
+            let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+            
+            let renderer = UIGraphicsImageRenderer(size: newSize)
+            let resizedImage = renderer.image { _ in
+                image.draw(in: CGRect(origin: .zero, size: newSize))
+            }
+            
+            return resizedImage
         }
     }
 }

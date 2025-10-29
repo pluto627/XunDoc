@@ -22,6 +22,16 @@ struct XunDocApp: App {
 // MARK: - Root View with Launch Screen
 struct RootView: View {
     @State private var showLaunchScreen = true
+    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("appFontSize") private var fontSizeString = "中"
+    
+    private var fontScale: CGFloat {
+        switch fontSizeString {
+        case "小": return 0.9
+        case "大": return 1.15
+        default: return 1.0
+        }
+    }
     
     var body: some View {
         Group {
@@ -29,8 +39,10 @@ struct RootView: View {
                 LaunchScreenView(isActive: $showLaunchScreen)
             } else {
                 ContentView()
+                    .environment(\.sizeCategory, fontScale > 1.0 ? .extraLarge : (fontScale < 1.0 ? .small : .medium))
             }
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
         .onChange(of: showLaunchScreen) { oldValue, newValue in
             print("📱 showLaunchScreen 状态改变: \(oldValue) -> \(newValue)")
         }

@@ -79,8 +79,9 @@ struct OverviewSection: View {
     @EnvironmentObject var healthDataManager: HealthDataManager
     
     private var pendingMedicationsCount: String {
-        let count = healthDataManager.getTodayMedications().count
-        return "\(count)"
+        let todayMeds = healthDataManager.getTodayMedications()
+        let totalCount = todayMeds.reduce(0) { $0 + $1.times.count }
+        return "\(totalCount)"
     }
     
     private var totalRecordsCount: String {
@@ -153,12 +154,25 @@ struct OverviewCard: View {
 // MARK: - Today Medication Section
 struct TodayMedicationSection: View {
     @EnvironmentObject var healthDataManager: HealthDataManager
-    @State private var completedMedications: Set<UUID> = []
+    @State private var completedMedications: Set<String> = []  // 改用 String 来存储组合ID
     @State private var showingMedicationView = false
     
-    private var todayMedications: [(medication: MedicationReminder, times: [Date])] {
+    // 生成唯一标识符：medicationId + scheduledTime
+    private func makeItemId(medication: MedicationReminder, time: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd-HH-mm"
+        return "\(medication.id.uuidString)-\(formatter.string(from: time))"
+    }
+    
+    private var todayMedications: [(medication: MedicationReminder, time: Date, itemId: String)] {
         return healthDataManager.getTodayMedications()
-            .filter { !completedMedications.contains($0.medication.id) }
+            .flatMap { item in
+                item.times.map { time in
+                    let itemId = makeItemId(medication: item.medication, time: time)
+                    return (medication: item.medication, time: time, itemId: itemId)
+                }
+            }
+            .filter { !completedMedications.contains($0.itemId) }
     }
     
     var body: some View {
@@ -224,19 +238,24 @@ struct TodayMedicationSection: View {
                 .cardShadow()
                 .fadeIn(delay: 0.2)
             } else {
-                ForEach(todayMedications, id: \.medication.id) { item in
+                ForEach(todayMedications, id: \.itemId) { item in
                     TodayMedicationRow(
                         medication: item.medication,
-                        time: item.times.first ?? Date(),
+                        time: item.time,
                         onComplete: {
-                            withAnimation {
-                                _ = completedMedications.insert(item.medication.id)
+                            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                                _ = completedMedications.insert(item.itemId)
                             }
                         }
                     )
                     .transition(.asymmetric(
-                        insertion: .opacity,
-                        removal: .move(edge: .leading).combined(with: .opacity)
+                        insertion: .scale.combined(with: .opacity),
+                        removal: .asymmetric(
+                            insertion: .identity,
+                            removal: .move(edge: .leading)
+                                .combined(with: .opacity)
+                                .combined(with: .scale(scale: 0.8))
+                        )
                     ))
                 }
             }
@@ -253,6 +272,7 @@ struct TodayMedicationRow: View {
     let time: Date
     let onComplete: () -> Void
     @State private var isCompleted = false
+    @EnvironmentObject var healthDataManager: HealthDataManager
     
     private var timeString: String {
         let formatter = DateFormatter()
@@ -291,10 +311,19 @@ struct TodayMedicationRow: View {
             
             // 右侧完成按钮
             Button(action: {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                // 先显示完成动画
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     isCompleted = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                
+                // 记录服药
+                healthDataManager.recordMedicationTaken(
+                    medicationId: medication.id,
+                    scheduledTime: time
+                )
+                
+                // 延迟后触发消失动画
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     onComplete()
                 }
             }) {
@@ -461,7 +490,8 @@ struct RealCaseFileCard: View {
     }
     
     var body: some View {
-        NavigationLink(destination: RecordDetailViewWrapper(record: record)) {
+        NavigationLink(destination: RecordDetailView(record: record)
+            .environmentObject(healthDataManager)) {
             VStack(alignment: .leading, spacing: 0) {
                 // 上半部分：医院和科室信息
                 HStack(alignment: .center, spacing: 12) {

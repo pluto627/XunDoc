@@ -17,6 +17,7 @@ class HealthDataManager: ObservableObject {
     @Published var chronicDiseaseData: [ChronicDiseaseData] = []
     @Published var aiConsultations: [AIConsultation] = []
     @Published var medicationReminders: [MedicationReminder] = []
+    @Published var medicationTakenRecords: [MedicationTakenRecord] = []
     
     private let userDefaults = UserDefaults.standard
     private let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -51,6 +52,14 @@ class HealthDataManager: ObservableObject {
         if let encoded = try? JSONEncoder().encode(medicationReminders) {
             userDefaults.set(encoded, forKey: "medicationReminders")
         }
+        
+        // 保存服药记录
+        if let encoded = try? JSONEncoder().encode(medicationTakenRecords) {
+            userDefaults.set(encoded, forKey: "medicationTakenRecords")
+            print("  ✅ 已保存 \(medicationTakenRecords.count) 条服药记录")
+        }
+        
+        print("💾 HealthDataManager.saveData 完成")
     }
     
     func loadData() {
@@ -76,6 +85,13 @@ class HealthDataManager: ObservableObject {
         if let data = userDefaults.data(forKey: "medicationReminders"),
            let decoded = try? JSONDecoder().decode([MedicationReminder].self, from: data) {
             medicationReminders = decoded
+        }
+        
+        // 加载服药记录
+        if let data = userDefaults.data(forKey: "medicationTakenRecords"),
+           let decoded = try? JSONDecoder().decode([MedicationTakenRecord].self, from: data) {
+            medicationTakenRecords = decoded
+            print("📋 已加载 \(medicationTakenRecords.count) 条服药记录")
         }
     }
     
@@ -134,26 +150,83 @@ class HealthDataManager: ObservableObject {
         for medication in activeMedications {
             print("\n检查药物: \(medication.medicationName)")
             print("提醒时间数量: \(medication.reminderTimes.count)")
-            medication.reminderTimes.forEach { time in
-                let isToday = calendar.isDate(time, inSameDayAs: today)
-                print("  - \(dateFormatter.string(from: time)) | 是否今天: \(isToday)")
+            
+            // 将reminderTimes中的时间部分（小时:分钟）应用到今天
+            let todayTimes = medication.reminderTimes.compactMap { originalTime -> Date? in
+                let hour = calendar.component(.hour, from: originalTime)
+                let minute = calendar.component(.minute, from: originalTime)
+                
+                // 创建今天的该时间
+                var components = calendar.dateComponents([.year, .month, .day], from: today)
+                components.hour = hour
+                components.minute = minute
+                
+                return calendar.date(from: components)
             }
             
-            // 获取今天的服药时间
-            let todayTimes = medication.reminderTimes.filter { time in
-                calendar.isDate(time, inSameDayAs: today)
+            // 过滤掉已服用的时间
+            let unTakenTimes = todayTimes.filter { scheduledTime in
+                !isMedicationTaken(medicationId: medication.id, scheduledTime: scheduledTime)
             }
             
-            if !todayTimes.isEmpty {
-                print("✅ 添加到今日用药列表")
-                todayMeds.append((medication: medication, times: todayTimes))
+            print("  - 总服药次数: \(todayTimes.count)")
+            print("  - 未服用次数: \(unTakenTimes.count)")
+            
+            if !unTakenTimes.isEmpty {
+                print("✅ 添加到今日用药列表，共 \(unTakenTimes.count) 次")
+                todayMeds.append((medication: medication, times: unTakenTimes))
             } else {
-                print("❌ 无今日服药时间")
+                print("❌ 无待服用时间")
             }
         }
         
         print("\n今日用药总数: \(todayMeds.count)")
         return todayMeds
+    }
+    
+    // MARK: - 服药记录管理
+    
+    /// 记录服药
+    func recordMedicationTaken(medicationId: UUID, scheduledTime: Date) {
+        let record = MedicationTakenRecord(
+            medicationId: medicationId,
+            takenDate: Date(),
+            scheduledTime: scheduledTime
+        )
+        medicationTakenRecords.append(record)
+        saveData()
+        
+        print("✅ 已记录服药: \(scheduledTime)")
+        print("📊 当前服药记录总数: \(medicationTakenRecords.count)")
+    }
+    
+    /// 检查某个药物在某个时间是否已服用
+    func isMedicationTaken(medicationId: UUID, scheduledTime: Date) -> Bool {
+        let calendar = Calendar.current
+        
+        // 查找是否有匹配的服药记录
+        let taken = medicationTakenRecords.contains { record in
+            record.medicationId == medicationId &&
+            calendar.isDate(record.scheduledTime, equalTo: scheduledTime, toGranularity: .minute)
+        }
+        
+        return taken
+    }
+    
+    /// 清理过期的服药记录（保留最近7天）
+    func cleanOldMedicationRecords() {
+        let calendar = Calendar.current
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+        
+        let oldCount = medicationTakenRecords.count
+        medicationTakenRecords.removeAll { record in
+            record.takenDate < sevenDaysAgo
+        }
+        
+        if medicationTakenRecords.count != oldCount {
+            saveData()
+            print("🗑️ 已清理 \(oldCount - medicationTakenRecords.count) 条过期服药记录")
+        }
     }
     
     // MARK: - 慢性病数据管理
@@ -197,17 +270,68 @@ class HealthDataManager: ObservableObject {
     func addMedicationReminder(_ reminder: MedicationReminder) {
         medicationReminders.append(reminder)
         saveData()
+        
+        // 自动创建通知
+        Task {
+            await createNotificationsForMedication(reminder)
+        }
     }
     
     func updateMedicationReminder(_ reminder: MedicationReminder) {
         if let index = medicationReminders.firstIndex(where: { $0.id == reminder.id }) {
             medicationReminders[index] = reminder
             saveData()
+            
+            // 更新通知
+            Task {
+                await createNotificationsForMedication(reminder)
+            }
+        }
+    }
+    
+    func deleteMedicationReminder(_ reminder: MedicationReminder) {
+        medicationReminders.removeAll { $0.id == reminder.id }
+        saveData()
+        
+        // 取消通知
+        Task {
+            await cancelNotificationsForMedication(reminder.id)
         }
     }
     
     func getActiveMedicationReminders() -> [MedicationReminder] {
         return medicationReminders.filter { $0.isActive }
+    }
+    
+    // MARK: - 药物通知管理
+    
+    /// 为药物创建通知
+    private func createNotificationsForMedication(_ medication: MedicationReminder) async {
+        let notificationManager = await MedicalNotificationManager.shared
+        await notificationManager.scheduleMedicationReminders(medication: medication)
+    }
+    
+    /// 取消药物的所有通知
+    private func cancelNotificationsForMedication(_ medicationId: UUID) async {
+        let notificationManager = await MedicalNotificationManager.shared
+        await notificationManager.cancelMedicationReminders(medicationId: medicationId)
+    }
+    
+    /// 同步所有活跃药物的通知
+    func syncAllMedicationNotifications() async {
+        let notificationManager = await MedicalNotificationManager.shared
+        
+        // 请求通知权限
+        let hasPermission = await notificationManager.requestNotificationPermission()
+        
+        if hasPermission {
+            // 为所有活跃药物创建通知
+            let activeMeds = getActiveMedicationReminders()
+            await notificationManager.scheduleMedicationReminders(medications: activeMeds)
+            print("✅ 已同步 \(activeMeds.count) 个药物的通知")
+        } else {
+            print("❌ 通知权限被拒绝")
+        }
     }
     
     // MARK: - 数据分析

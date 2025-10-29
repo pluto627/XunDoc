@@ -305,6 +305,121 @@ class MedicalNotificationManager: ObservableObject {
         }
         deleteNotifications(oldNotifications)
     }
+    
+    // MARK: - 药物提醒通知
+    
+    /// 为药物提醒创建通知
+    func scheduleMedicationReminders(medication: MedicationReminder) {
+        guard hasPermission else {
+            print("❌ 没有通知权限，无法创建药物提醒")
+            return
+        }
+        
+        guard medication.isActive else {
+            print("❌ 药物未激活，跳过通知创建")
+            return
+        }
+        
+        // 先取消该药物的所有旧通知
+        cancelMedicationReminders(medicationId: medication.id)
+        
+        let calendar = Calendar.current
+        let today = Date()
+        
+        // 为每个提醒时间创建通知
+        for reminderTime in medication.reminderTimes {
+            // 提取时间部分
+            let hour = calendar.component(.hour, from: reminderTime)
+            let minute = calendar.component(.minute, from: reminderTime)
+            
+            // 检查药物是否在有效期内
+            if let endDate = medication.endDate, today > endDate {
+                print("⏭️ 药物已过期，跳过通知创建")
+                continue
+            }
+            
+            // 创建通知内容
+            let content = UNMutableNotificationContent()
+            content.title = "💊 用药提醒"
+            content.body = "\(medication.medicationName) - \(medication.dosage)"
+            content.sound = .default
+            content.badge = 1
+            content.categoryIdentifier = "MEDICATION_REMINDER"
+            
+            // 添加用药说明
+            if let instructions = medication.instructions {
+                content.subtitle = instructions
+            }
+            
+            // 添加额外信息
+            content.userInfo = [
+                "medicationId": medication.id.uuidString,
+                "medicationName": medication.medicationName,
+                "dosage": medication.dosage,
+                "type": "medication"
+            ]
+            
+            // 创建每日重复触发器
+            var dateComponents = DateComponents()
+            dateComponents.hour = hour
+            dateComponents.minute = minute
+            
+            let trigger = UNCalendarNotificationTrigger(
+                dateMatching: dateComponents,
+                repeats: true  // 每天重复
+            )
+            
+            // 创建唯一标识符：medicationId + 时间
+            let identifier = "\(medication.id.uuidString)-\(hour)-\(minute)"
+            
+            let request = UNNotificationRequest(
+                identifier: identifier,
+                content: content,
+                trigger: trigger
+            )
+            
+            // 添加通知
+            notificationCenter.add(request) { error in
+                if let error = error {
+                    print("❌ 药物通知创建失败: \(error.localizedDescription)")
+                } else {
+                    print("✅ 已创建药物提醒: \(medication.medicationName) at \(hour):\(String(format: "%02d", minute))")
+                }
+            }
+        }
+        
+        print("📱 已为药物 \(medication.medicationName) 创建 \(medication.reminderTimes.count) 个通知")
+    }
+    
+    /// 取消药物的所有提醒通知
+    func cancelMedicationReminders(medicationId: UUID) {
+        // 获取所有待处理的通知
+        notificationCenter.getPendingNotificationRequests { requests in
+            let medicationNotifications = requests.filter { request in
+                request.identifier.starts(with: medicationId.uuidString)
+            }
+            
+            let identifiers = medicationNotifications.map { $0.identifier }
+            if !identifiers.isEmpty {
+                self.notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+                print("🗑️ 已取消 \(identifiers.count) 个药物通知")
+            }
+        }
+    }
+    
+    /// 批量为多个药物创建通知
+    func scheduleMedicationReminders(medications: [MedicationReminder]) {
+        for medication in medications where medication.isActive {
+            scheduleMedicationReminders(medication: medication)
+        }
+    }
+    
+    /// 获取所有待处理的通知（用于调试）
+    func getPendingNotificationCount(completion: @escaping (Int) -> Void) {
+        notificationCenter.getPendingNotificationRequests { requests in
+            completion(requests.count)
+        }
+    }
 }
 
 // MARK: - 通知统计模型

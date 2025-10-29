@@ -1,0 +1,326 @@
+# Fastfile - XunDoc 自动化测试配置
+# 使用方法: fastlane [lane_name]
+
+default_platform(:ios)
+
+platform :ios do
+  
+  # ======================================================
+  # 测试相关 Lanes
+  # ======================================================
+  
+  desc "🚀 运行UI自动化测试"
+  desc "在iPhone 15 Pro模拟器上运行所有UI测试"
+  lane :ui_test do
+    UI.message("开始运行UI自动化测试...")
+    
+    run_tests(
+      scheme: "XunDoc",
+      devices: ["iPhone 15 Pro"],
+      clean: true,
+      code_coverage: true,
+      output_directory: "./test_output",
+      output_types: "html,junit",
+      xcargs: "-only-testing:XunDocUITests"
+    )
+    
+    UI.success("✅ UI测试完成！")
+    UI.message("📊 查看报告: ./test_output/report.html")
+  end
+  
+  desc "⚡ 快速测试 - 仅核心功能"
+  desc "运行启动、导航、创建记录三个核心测试"
+  lane :quick_test do
+    UI.message("开始快速测试...")
+    
+    run_tests(
+      scheme: "XunDoc",
+      devices: ["iPhone 15 Pro"],
+      clean: false,
+      only_testing: [
+        "XunDocUITests/XunDocAutomatedTests/test001_AppLaunch",
+        "XunDocUITests/XunDocAutomatedTests/test002_TabBarNavigation",
+        "XunDocUITests/XunDocAutomatedTests/test003_CreateHealthRecord"
+      ]
+    )
+    
+    UI.success("✅ 快速测试完成！")
+  end
+  
+  desc "🔬 完整测试套件"
+  desc "在多个设备上运行完整测试套件"
+  lane :full_test do
+    UI.message("开始完整测试套件...")
+    
+    # 清理之前的测试输出
+    sh("rm -rf ../test_output")
+    sh("mkdir -p ../test_output")
+    
+    # 在多个设备上运行
+    devices = [
+      "iPhone 15 Pro",
+      "iPhone 14",
+      "iPhone SE (3rd generation)"
+    ]
+    
+    devices.each do |device|
+      UI.message("📱 在 #{device} 上运行测试...")
+      
+      run_tests(
+        scheme: "XunDoc",
+        devices: [device],
+        clean: false,
+        code_coverage: true,
+        result_bundle: true,
+        output_directory: "./test_output/#{device.gsub(' ', '_')}",
+        output_types: "html,junit,json",
+        xcargs: "-only-testing:XunDocUITests"
+      )
+    end
+    
+    # 生成汇总报告
+    generate_summary_report
+    
+    UI.success("✅ 完整测试套件完成！")
+    UI.message("📊 查看汇总报告: ./test_output/summary.html")
+  end
+  
+  desc "🌙 夜间回归测试"
+  desc "完整的夜间自动化测试，包含清理和报告"
+  lane :nightly do
+    UI.header("开始夜间回归测试")
+    
+    begin
+      # 1. 清理构建产物
+      UI.message("🧹 清理构建产物...")
+      clean_build_artifacts
+      
+      # 2. 运行完整测试
+      full_test
+      
+      # 3. 生成覆盖率报告
+      UI.message("📈 生成代码覆盖率报告...")
+      xcov(
+        scheme: "XunDoc",
+        output_directory: "./test_output/coverage",
+        minimum_coverage_percentage: 70.0
+      )
+      
+      # 4. 发送通知
+      notification(
+        title: "✅ XunDoc 夜间测试完成",
+        message: "所有测试通过，请查看详细报告"
+      )
+      
+      UI.success("✅ 夜间测试全部完成！")
+      
+    rescue => ex
+      # 测试失败时的处理
+      UI.error("❌ 夜间测试失败: #{ex.message}")
+      
+      notification(
+        title: "❌ XunDoc 夜间测试失败",
+        message: "测试失败，请检查日志"
+      )
+      
+      raise ex
+    end
+  end
+  
+  desc "🎯 单元测试"
+  desc "运行单元测试（非UI测试）"
+  lane :unit_test do
+    UI.message("开始运行单元测试...")
+    
+    run_tests(
+      scheme: "XunDoc",
+      devices: ["iPhone 15 Pro"],
+      clean: true,
+      code_coverage: true,
+      xcargs: "-only-testing:XunDocTests"
+    )
+    
+    UI.success("✅ 单元测试完成！")
+  end
+  
+  desc "📊 生成测试报告"
+  desc "从.xcresult文件生成HTML测试报告"
+  lane :generate_report do |options|
+    xcresult_path = options[:xcresult_path] || "./test_output/XunDoc.xcresult"
+    
+    UI.message("生成测试报告...")
+    
+    sh("xcrun xcresulttool get --format json --path #{xcresult_path} > ../test_output/results.json")
+    
+    UI.success("报告生成完成！")
+  end
+  
+  # ======================================================
+  # 辅助方法
+  # ======================================================
+  
+  desc "生成测试汇总报告"
+  private_lane :generate_summary_report do
+    UI.message("生成测试汇总报告...")
+    
+    # 创建简单的HTML汇总报告
+    html_content = <<-HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>XunDoc 测试报告</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .device {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #007AFF;
+        }
+        .success { color: #34C759; }
+        .failure { color: #FF3B30; }
+        .timestamp { color: #999; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>📊 XunDoc 自动化测试报告</h1>
+    <div class="summary">
+        <h2>测试概览</h2>
+        <p>测试时间: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <p>测试设备: iPhone 15 Pro, iPhone 14, iPhone SE (3rd generation)</p>
+        <p>测试用例数: 10个</p>
+    </div>
+    
+    <div class="device">
+        <h3>📱 iPhone 15 Pro</h3>
+        <p>查看详细报告: <a href="iPhone_15_Pro/report.html">report.html</a></p>
+    </div>
+    
+    <div class="device">
+        <h3>📱 iPhone 14</h3>
+        <p>查看详细报告: <a href="iPhone_14/report.html">report.html</a></p>
+    </div>
+    
+    <div class="device">
+        <h3>📱 iPhone SE (3rd generation)</h3>
+        <p>查看详细报告: <a href="iPhone_SE_(3rd_generation)/report.html">report.html</a></p>
+    </div>
+</body>
+</html>
+    HTML
+    
+    File.write("./test_output/summary.html", html_content)
+  end
+  
+  # ======================================================
+  # 构建相关 Lanes
+  # ======================================================
+  
+  desc "🏗️ 构建应用"
+  lane :build do
+    build_app(
+      scheme: "XunDoc",
+      configuration: "Debug",
+      skip_archive: true,
+      skip_codesigning: true
+    )
+  end
+  
+  desc "🧹 清理构建产物"
+  lane :clean do
+    clean_build_artifacts
+    sh("rm -rf ../DerivedData")
+    sh("rm -rf ../test_output")
+    UI.success("✅ 清理完成！")
+  end
+  
+  # ======================================================
+  # 截图和App Store
+  # ======================================================
+  
+  desc "📸 生成App Store截图"
+  lane :screenshots do
+    capture_screenshots(
+      scheme: "XunDoc",
+      devices: [
+        "iPhone 15 Pro Max",
+        "iPhone 15 Pro",
+        "iPhone 8 Plus",
+        "iPad Pro (12.9-inch) (6th generation)"
+      ],
+      languages: ["zh-Hans", "en-US"],
+      clear_previous_screenshots: true,
+      output_directory: "./screenshots"
+    )
+    
+    UI.success("✅ 截图生成完成！")
+  end
+  
+  # ======================================================
+  # 版本管理
+  # ======================================================
+  
+  desc "🔢 版本号递增"
+  lane :bump_version do |options|
+    version_type = options[:type] || "patch" # major, minor, patch
+    
+    increment_version_number(
+      bump_type: version_type
+    )
+    
+    increment_build_number
+    
+    UI.success("✅ 版本号已更新！")
+  end
+  
+  # ======================================================
+  # 错误处理
+  # ======================================================
+  
+  error do |lane, exception|
+    UI.error("❌ Lane '#{lane}' 执行失败")
+    UI.error("错误信息: #{exception.message}")
+    
+    # 发送失败通知
+    notification(
+      title: "❌ XunDoc 构建失败",
+      message: "Lane: #{lane}\n错误: #{exception.message}"
+    )
+  end
+  
+end
+
+# ======================================================
+# 自定义Actions (可选)
+# ======================================================
+
+# 示例：自定义测试前的准备工作
+before_all do |lane, options|
+  UI.message("准备执行 lane: #{lane}")
+  
+  # 确保使用正确的Xcode版本
+  # xcversion(version: "15.0")
+end
+
+# 示例：测试完成后的清理工作
+after_all do |lane, options|
+  UI.success("Lane '#{lane}' 执行完成！")
+end
+
+
