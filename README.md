@@ -297,7 +297,7 @@ XunDoc 高度重视用户隐私：
 如有任何问题或建议，欢迎通过以下方式联系：
 
 - 提交 [Issue](https://github.com/pluto627/XunDoc/issues)
-- 发送邮件至 your.email@example.com
+- 发送邮件至 plutoguogg@gmail.com
 - 关注项目获取最新动态
 
 ---
