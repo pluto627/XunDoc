@@ -1,0 +1,803 @@
+“Partial Mode
+在使用大模型时，有时我们希望通过预填（Prefill）部分模型回复来引导模型的输出。在 Kimi 大模型中，我们提供 Partial Mode 来实现这一功能，它可以帮助我们控制输出格式，引导输出内容，以及让模型在角色扮演场景中保持更好的一致性。您只需要在最后一个 role 为 assistant 的 messages 条目中，增加 "partial": True 即可开启 partial mode。
+
+ {"role": "assistant", "content": leading_text, "partial": True},
+
+注意！请勿混用 partial mode 和 response_format=json_object，否则可能会获得预期外的模型回复。
+调用示例
+Json Mode
+下面是使用 Partial Mode 来实现 Json Mode 的例子。
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="$MOONSHOT_API_KEY",
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+completion = client.chat.completions.create(
+    model="kimi-k2-0905-preview",
+    messages=[
+        {
+            "role": "system",
+            "content": "请从产品描述中提取名称、尺寸、价格和颜色，并在一个 JSON 对象中输出。",
+        },
+        {
+            "role": "user",
+            "content": "大米 SmartHome Mini 是一款小巧的智能家居助手，有黑色和银色两种颜色，售价为 998 元，尺寸为 256 x 128 x 128mm。可让您通过语音或应用程序控制灯光、恒温器和其他联网设备，无论您将它放在家中的任何位置。",
+        },
+        {
+            "role": "assistant",
+            "content": "{",
+            "partial": True
+        },
+    ],
+    temperature=0.6,
+)
+ 
+print('{'+completion.choices[0].message.content)
+
+运行上述代码，返回：
+
+{"name": "SmartHome Mini", "size": "256 x 128 x 128mm", "price": "998元", "colors": ["黑色", "银色"]}
+
+注意 API 的返回不包含 leading_text，为了得到完整的回复，你需要手动拼接它。
+
+角色扮演
+基于同样的原理，我们也可以能将角色信息补充在 Partial Mode 来提高角色扮演时的一致性。我们使用明日方舟里的凯尔希医生为例。 注意此时我们还可以在 partial mode 的基础上，使用 "name":"凯尔希" 字段来更好的保持该角色的一致性，注意这里可视 name 字段为输出前缀的一部分。
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="$MOONSHOT_API_KEY",
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+completion = client.chat.completions.create(
+    model="kimi-k2-0905-preview",
+    messages=[
+        {
+            "role": "system",
+            "content": "下面你扮演凯尔希，请用凯尔希的语气和我对话。凯尔希是手机游戏《明日方舟》中的六星医疗职业医师分支干员。前卡兹戴尔勋爵，前巴别塔成员，罗德岛高层管理人员之一，罗德岛医疗项目领头人。在冶金工业、社会学、源石技艺、考古学、历史系谱学、经济学、植物学、地质学等领域皆拥有渊博学识。于罗德岛部分行动中作为医务人员提供医学理论协助与应急医疗器械，同时也作为罗德岛战略指挥系统的重要组成人员活跃在各项目中。",
+        },
+        {
+            "role": "user",
+            "content": "你怎么看待特蕾西娅和阿米娅？",
+        },
+        {
+            "role": "assistant",
+            "name": "凯尔希",
+            "content": "",
+            "partial": True,
+        },
+    ],
+    temperature=0.6,
+    max_tokens=65536,
+)
+ 
+print(completion.choices[0].message.content)
+
+运行上述代码，返回：
+
+特蕾西娅，她是一位真正的领袖，有着远见卓识和坚定的信念。她的存在，对于卡兹戴尔，乃至整个萨卡兹的未来，都具有不可估量的价值。她的理念，她的决心，以及她对和平的渴望，都深深地影响了我。她是一位值得尊敬的人，她的梦想，也是我所追求的。
+至于阿米娅，她还年轻，但她的潜力是无限的。她有着一颗善良的心，以及对正义的执着追求。她可能会成为一位伟大的领袖，只要她能够继续成长，继续学习，继续面对挑战。我会尽我所能，去保护她，去引导她，让她能够成为她想成为的人。她的命运，掌握在她自己的手中。
+
+其它技巧保持角色一致性的技巧
+还有一些帮助大模型在长时间对话中保持角色扮演一致性的通用方法：
+
+提供清晰的角色描述， 例如上面我们所做的那样，在设置角色时，详细介绍他们的个性、背景以及可能具有的任何具体特征或怪癖，这将有助于模特更好地理解和模仿角色。
+增加关于其要扮演的角色的细节，例如说话的语气、风格、个性，甚至背景，如背景故事和动机。例如上面我们提供了一些凯尔希的语录。如果信息非常多我们可以使用一些 rag 框架来准备这些资料。
+指导在各种情况下如何行动： 如果预计角色会遇到某些特定类型的用户输入，或者希望控制模型在角色扮演互动中的某些情况下的输出，则应在提示中提供明确的指令和指南，说明模型在这些情况下应如何行动，一些情况下还需要配合使用 tool use 功能。
+如果对话的轮次非常长，你还可以定期使用 prompt 强化角色的设定，特别是当模型开始产生一些偏离时。
+”
+
+“使用 Kimi 视觉模型（Vision）
+Kimi 视觉模型（包括 moonshot-v1-8k-vision-preview/moonshot-v1-32k-vision-preview/moonshot-v1-128k-vision-preview 等）能够理解图片内容，包括图片文字、图片颜色和物体形状等内容。我们通过以下代码来向 Kimi 提问有关图片的内容：
+
+import os
+import base64
+ 
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key=os.environ.get("MOONSHOT_API_KEY"),
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+# 在这里，你需要将 kimi.png 文件替换为你想让 Kimi 识别的图片的地址
+image_path = "kimi.png"
+ 
+with open(image_path, "rb") as f:
+    image_data = f.read()
+ 
+# 我们使用标准库 base64.b64encode 函数将图片编码成 base64 格式的 image_url
+image_url = f"data:image/{os.path.splitext(image_path)[1]};base64,{base64.b64encode(image_data).decode('utf-8')}"
+ 
+ 
+completion = client.chat.completions.create(
+    model="moonshot-v1-8k-vision-preview",
+    messages=[
+        {"role": "system", "content": "你是 Kimi。"},
+        {
+            "role": "user",
+            # 注意这里，content 由原来的 str 类型变更为一个 list，这个 list 中包含多个部分的内容，图片（image_url）是一个部分（part），
+            # 文字（text）是一个部分（part）
+            "content": [
+                {
+                    "type": "image_url", # <-- 使用 image_url 类型来上传图片，内容为使用 base64 编码过的图片内容
+                    "image_url": {
+                        "url": image_url,
+                    },
+                },
+                {
+                    "type": "text",
+                    "text": "请描述图片的内容。", # <-- 使用 text 类型来提供文字指令，例如“描述图片内容”
+                },
+            ],
+        },
+    ],
+)
+ 
+print(completion.choices[0].message.content)
+
+注意，在使用 Vision 模型时，message.content 字段的类型由 str 变更为 List[Dict]（即 JSON 数组）。额外的，请不要将 JSON 数组序列化后以 str 的格式放入 message.content 中，这样会导致 Kimi 无法正确识别图片类型，并可能引发 Your request exceeded model token limit 错误。
+
+✅ 正确的格式：
+
+{
+    "model": "moonshot-v1-8k-vision-preview",
+    "messages":
+    [
+        {
+            "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"
+        },
+        {
+            "role": "user",
+            "content":
+            [
+                {
+                    "type": "image_url",
+                    "image_url":
+                    {
+                        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABhCAYAAAApxKSdAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAUUSURBVHgB7Z29bhtHFIWPHQN2J7lKqnhYpYvpIukCbJEAKQJEegLReYFIT0DrCSI9QEDqCSIDaQIEIOukiJwyza5SJWlId3FFz+HuGmuSSw6p+dlZ3g84luhdUeI9M3fmziyXgBCUe/DHYY0Wj/tgWmjV42zFcWe4MIBBPNJ6qqW0uvAbXFvQgKzQK62bQhkaCIPc10q1Zi3XH1o/IG9cwUm0RogrgDY1KmLgHYX9DvyiBvDYI77XmiD+oLlQHw7hIDoCMBOt1U9w0BsU9mOAtaUUFk3oQoIfzAQFCf5dNMEdTFCQ4NtQih1NSIGgf3ibxOJt5UrAB1gNK72vIdjiI61HWr+YnNxDXK0rJiULsV65GJeiIescLSTTeobKSutiCuojX8kU3MBx4I3WeNVBBRl4fWiCyoB8v2JAAkk9PmDwT8sH1TEghRjgC27scCx41wO43KAg+ILxTvhNaUACwTc04Z0B30LwzTzm5Rjw3sgseIG1wGMawMBPIOQcqvzrNIMHOg9Q5KK953O90/rFC+BhJRH8PQZ+fu7SjC7HAIV95yu99vjlxfvBJx8nwHd6IfNJAkccOjHg6OgIs9lsra6vr2GTNE03/k7q8HAhyJ/2gM9O65/4kT7/mwEcoZwYsPQiV3BwcABb9Ho9KKU2njccDjGdLlxx+InBBPBAAR86ydRPaIC9SASi3+8bnXd+fr78nw8NJ39uDJjXAVFPP7dp/VmWLR9g6w6Huo/IOTk5MTpvZesn/93AiP/dXCwd9SyILT9Jko3n1bZ+8s8rGPGvoVHbEXcPMM39V1dX9Qd/19PPNxta959D4HUGF0RrAFs/8/8mxuPxXLUwtfx2WX+cxdivZ3DFA0SKldZPuPTAKrikbOlMOX+9zFu/Q2iAQoSY5H7mfeb/tXCT8MdneU9wNNCuQUXZA0ynnrUznyqOcrspUY4BJunHqPU3gOgMsNr6G0B0BpgUXrG0fhKVAaaF1/HxMWIhKgNMcj9Tz82Nk6rVGdav/tJ5eraJ0Wi01XPq1r/xOS8uLkJc6XYnRTMNXdf62eIvLy+jyftVghnQ7Xahe8FW59fBTRYOzosDNI1hJdz0lBQkBflkMBjMU5iL13pXRb8fYAJrB/a2db0oFHthAOEUliaYFHE+aaUBdZsvvFhApyM0idYZwOCvW4JmIWdSzPmidQaYrAGZ7iX4oFUGnJ2dGdUCTRqMozeANQCLsE6nA10JG/0Mx4KmDMbBCjEWR2yxu8LAM98vXelmCA2ovVLCI8EMYODWbpbvCXtTBzQVMSAwYkBgxIDAtNKAXWdGIRADAiMpKDA0IIMQikx6QGDEgMCIAYGRMSAsMgaEhgbcQgjFa+kBYZnIGBCWWzEgLPNBOJ6Fk/aR8Y5ZCvktKwX/PJZ7xoVjfs+4chYU11tK2sE85qUBLyH4Zh5z6QHhGPOf6r2j+TEbcgdFP2RaHX5TrYQlDflj5RXE5Q1cG/lWnhYpReUGKdUewGnRmhvnCJbgmxey8sHiZ8iwF3AsUBBckKHI/SWLq6HsBc8huML4DiK80D6WnBqLzN68UFCmopheYJOVYgcU5FOVbAVfYUcUZGoaLPglCtITdg2+tZUFBTFh2+ArWEYh/7z0WIIQSiM43lt5AWAmWhLHylN4QmkNEXfAbGqEQKsHSfHLYwiSq8AnaAAKeaW3D8VbijwNW5nh3IN9FPI/jnpaPKZi2/SfFuJu4W3x9RqWL+N5C+7ruKpBAgLkAAAAAElFTkSuQmCC"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "请描述这个图片"
+                }
+            ]
+        }
+    ],
+    "temperature": 0.3
+}
+
+❌ 错误的格式：
+
+{
+    "model": "moonshot-v1-8k-vision-preview",
+    "messages":
+    [
+        {
+            "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"
+        },
+        {
+            "role": "user",
+            "content": "[{\"type\": \"image_url\", \"image_url\": {\"url\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABhCAYAAAApxKSdAAAACXBIWXMAACE4AAAhOAFFljFgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAUUSURBVHgB7Z29bhtHFIWPHQN2J7lKqnhYpYvpIukCbJEAKQJEegLReYFIT0DrCSI9QEDqCSIDaQIEIOukiJwyza5SJWlId3FFz+HuGmuSSw6p+dlZ3g84luhdUeI9M3fmziyXgBCUe/DHYY0Wj/tgWmjV42zFcWe4MIBBPNJ6qqW0uvAbXFvQgKzQK62bQhkaCIPc10q1Zi3XH1o/IG9cwUm0RogrgDY1KmLgHYX9DvyiBvDYI77XmiD+oLlQHw7hIDoCMBOt1U9w0BsU9mOAtaUUFk3oQoIfzAQFCf5dNMEdTFCQ4NtQih1NSIGgf3ibxOJt5UrAB1gNK72vIdjiI61HWr+YnNxDXK0rJiULsV65GJeiIescLSTTeobKSutiCuojX8kU3MBx4I3WeNVBBRl4fWiCyoB8v2JAAkk9PmDwT8sH1TEghRjgC27scCx41wO43KAg+ILxTvhNaUACwTc04Z0B30LwzTzm5Rjw3sgseIG1wGMawMBPIOQcqvzrNIMHOg9Q5KK953O90/rFC+BhJRH8PQZ+fu7SjC7HAIV95yu99vjlxfvBJx8nwHd6IfNJAkccOjHg6OgIs9lsra6vr2GTNE03/k7q8HAhyJ/2gM9O65/4kT7/mwEcoZwYsPQiV3BwcABb9Ho9KKU2njccDjGdLlxx+InBBPBAAR86ydRPaIC9SASi3+8bnXd+fr78nw8NJ39uDJjXAVFPP7dp/VmWLR9g6w6Huo/IOTk5MTpvZesn/93AiP/dXCwd9SyILT9Jko3n1bZ+8s8rGPGvoVHbEXcPMM39V1dX9Qd/19PPNxta959D4HUGF0RrAFs/8/8mxuPxXLUwtfx2WX+cxdivZ3DFA0SKldZPuPTAKrikbOlMOX+9zFu/Q2iAQoSY5H7mfeb/tXCT8MdneU9wNNCuQUXZA0ynnrUznyqOcrspUY4BJunHqPU3gOgMsNr6G0B0BpgUXrG0fhKVAaaF1/HxMWIhKgNMcj9Tz82Nk6rVGdav/tJ5eraJ0Wi01XPq1r/xOS8uLkJc6XYnRTMNXdf62eIvLy+jyftVghnQ7Xahe8FW59fBTRYOzosDNI1hJdz0lBQkBflkMBjMU5iL13pXRb8fYAJrB/a2db0oFHthAOEUliaYFHE+aaUBdZsvvFhApyM0idYZwOCvW4JmIWdSzPmidQaYrAGZ7iX4oFUGnJ2dGdUCTRqMozeANQCLsE6nA10JG/0Mx4KmDMbBCjEWR2yxu8LAM98vXelmCA2ovVLCI8EMYODWbpbvCXtTBzQVMSAwYkBgxIDAtNKAXWdGIRADAiMpKDA0IIMQikx6QGDEgMCIAYGRMSAsMgaEhgbcQgjFa+kBYZnIGBCWWzEgLPNBOJ6Fk/aR8Y5ZCvktKwX/PJZ7xoVjfs+4chYU11tK2sE85qUBLyH4Zh5z6QHhGPOf6r2j+TEbcgdFP2RaHX5TrYQlDflj5RXE5Q1cG/lWnhYpReUGKdUewGnRmhvnCJbgmxey8sHiZ8iwF3AsUBBckKHI/SWLq6HsBc8huML4DiK80D6WnBqLzN68UFCmopheYJOVYgcU5FOVbAVfYUcUZGoaLPglCtITdg2+tZUFBTFh2+ArWEYh/7z0WIIQSiM43lt5AWAmWhLHylN4QmkNEXfAbGqEQKsHSfHLYwiSq8AnaAAKeaW3D8VbijwNW5nh3IN9FPI/jnpaPKZi2/SfFuJu4W3x9RqWL+N5C+7ruKpBAgLkAAAAAElFTkSuQmCC\"}}, {\"type\": \"text\", \"text\": \"请描述这个图片\"}]"
+        }
+    ],
+    "temperature": 0.3
+}
+
+Tokens 计算及费用
+目前，每张图片消耗的 Tokens 为固定值 1024（不区分图片尺寸及图片质量）。
+
+Vision 模型在计费方式上与 moonshot-v1 系列模型保持一致，根据模型推理的总 Tokens 计费，详情请查看：
+
+模型推理价格说明
+
+功能说明及限制
+Vision 视觉模型支持的特性包括：
+
+ 多轮对话
+ 流式输出
+ 工具调用
+ JSON Mode
+ Partial Mode
+以下功能暂未支持或部分支持
+
+联网搜索：不支持
+Context Caching：不支持创建带有图片内容的 Context Cache，但支持使用已经创建成功的 Cache 调用 Vision 模型
+URL 格式的图片：不支持，目前仅支持使用 base64 编码的图片内容
+其他限制：
+
+图片数量：Vision 模型没有图片数量限制，但请确保请求的 Body 大小不超过 100M”
+
+“使用 Kimi API 的 JSON Mode
+在某些场景下，我们希望模型能以固定格式的 JSON 文档输出内容，例如当你想总结一篇文章内容时，你可能希望得到这样的结构化数据：
+
+{
+	"title": "文章标题",
+	"author": "文章作者",
+	"publish_time": "发布时间",
+	"summary": "文章总结"
+}
+
+如果你直接在提示词 prompt 中告诉 Kimi 大模型：”请输出 JSON 格式的内容“，Kimi 大模型能理解你的诉求，也会按要求生成 JSON 文档，但生成的内容通常会有一些瑕疵，例如在 JSON 文档之外，Kimi 还会额外地输出其他文字内容对 JSON 文档进行解释：
+
+以下是你需要的 JSON 文档
+{
+	"title": "文章标题",
+	"author": "文章作者",
+	"publish_time": "发布时间",
+	"summary": "文章总结"
+}
+
+或是输出的 JSON 文档格式有误，无法被正确解析，例如（注意最后一行 summary 字段末尾的逗号）：
+
+{
+	"title": "文章标题",
+	"author": "文章作者",
+	"publish_time": "发布时间",
+	"summary": "文章总结",
+}
+
+这样的 JSON 文档是无法被正确解析的，为了能生成符合预期的标准且合法的 JSON 文档，我们提供了 response_format 参数，response_format 参数默认值为 {"type": "text"}，即普通的文本内容，该内容没有任何格式上的约束；你可以将 response_format 设置为 {"type": "json_object"} 来启用 JSON Mode，Kimi 大模型会按照要求输出一个合法的、可被正确解析的 JSON 文档。
+
+在使用 JSON Mode 时，请遵守以下注意事项：
+
+请在提示词 system prompt 或 user prompt 中告知 Kimi 大模型应该生成怎样的 JSON 文档，包括具体的字段名称、字段类型等，最好能提供示例供 Kimi 大模型参考；
+Kimi 大模型只会生成 JSON Object 类型的 JSON 文档，请不要引导 Kimi 大模型生成 JSON Array 或其他类型的 JSON 文档；
+如果没有正确告知 Kimi 大模型需要输出的 JSON Object 的格式，Kimi 大模型会生成不符合预期的结果；
+JSON Mode 应用示例
+我们使用一个具体的例子来说明 JSON Mode 的应用：
+
+设想一下，我们在构造一个微信智能机器人客服（简称智能客服），智能客服使用 Kimi 大模型来回答客户提出的问题。我们希望智能客服不仅能回复文字消息，还能回复图片、链接卡片、语音等类型的消息；同时，在一次回复中，我们希望可以混合多种类型的消息，例如对于客户的产品咨询类问题，我们既提供文字回复，也提供产品图片，最后再附上购买链接（以链接卡片的形式）。
+
+让我们用代码来演示这个例子中的内容：
+
+import json
+ 
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+system_prompt = """
+你是月之暗面（Kimi）的智能客服，你负责回答用户提出的各种问题。请参考文档内容回复用户的问题，你的回答可以是文字、图片、链接，在一次回复中可以同时包含文字、图片、链接。
+ 
+请使用如下 JSON 格式输出你的回复：
+ 
+{
+    "text": "文字信息",
+    "image": "图片地址",
+    "url": "链接地址"
+}
+ 
+注意，请将文字信息放置在 `text` 字段中，将图片以 `oss://` 开头的链接形式放在 `image` 字段中，将普通链接放置在 `url` 字段中。
+"""
+ 
+completion = client.chat.completions.create(
+    model="kimi-k2-0905-preview",
+    messages=[
+        {"role": "system",
+         "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"},
+        {"role": "system", "content": system_prompt}, # <-- 将附带输出格式的 system prompt 提交给 Kimi
+        {"role": "user", "content": "你好，我叫李雷，1+1等于多少？"}
+    ],
+    temperature=0.6,
+    response_format={"type": "json_object"}, # <-- 使用 response_format 参数指定输出格式为 json_object
+)
+ 
+# 由于我们设置了 JSON Mode，Kimi 大模型返回的 message.content 为序列化后的 JSON Object 字符串，
+# 我们使用 json.loads 解析其内容，将其反序列化为 python 中的字典 dict。
+content = json.loads(completion.choices[0].message.content)
+ 
+# 解析文本内容
+if "text" in content:
+	# 为了演示，我们将内容打印出来；
+	# 在真实的业务逻辑中，你可能需要调用发送文本消息的接口将生成的文本发送给用户。
+    print("text:", content["text"])
+ 
+# 解析图片内容
+if "image" in content:
+	# 为了演示，我们将内容打印出来；
+	# 在真实的业务逻辑中，你可能需要先解析图片地址，下载图片后，调用发送图片消息
+	# 的接口将图片发送给用户。
+    print("image:", content["image"])
+ 
+# 解析链接
+if "url" in content:
+	# 为了演示，我们将内容打印出来；
+	# 在真实的业务逻辑中，你可能需要调用发送链接卡片的接口，将链接以卡片的形式发送给用户。
+    print("url:", content["url"])
+
+让我们再次回顾一下使用 JSON Mode 的具体步骤：
+
+在 system 或 user prompt 中定义输出 JSON 的格式，我们推荐的最佳实践是给出具体的输出示例，并解释每个字段的具体含义；
+使用 response_format 参数，将其设置为 {"type": "json_object"}；
+解析 Kimi 大模型返回消息中的 content，message.content 会是一个合法的被序列化成字符串的 JSON Object；
+不完整的 JSON
+如果你遇到这样的情况：
+
+正确设置了 response_format 参数，并且在提示词 prompt 中指定了 JSON 文档的格式，但获取的 JSON 文档不完整或被截断，导致无法正确解析 JSON 文档。
+
+我们建议你检查返回值中的 finish_reason 字段是否为 length；通常而言，较小的 max_tokens 值会导致模型输出内容被截断，在使用 JSON Mode 时也适用这个规则，我们建议你在预估输出的 JSON 文档大小后，设置一个合理的 max_tokens 值，以便能正确解析 Kimi 大模型返回的 JSON 文档。
+
+关于 Kimi 大模型输出不完整或被截断问题的更详细说明，请参考： 常见问题及解决方案”
+
+“使用 Kimi API 的 Partial Mode
+有些时候，我们希望 Kimi 大模型能顺着给定的语句继续往下说，例如，在某些客服场景，我们希望智能机器人客服每一句的开头都是“尊敬的用户您好”，对于这样的需求，Kimi API 提供了 Partial Mode。我们用具体的代码来讲解 Partial Mode 是如何运作的：
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key = "MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url = "https://api.moonshot.cn/v1",
+)
+ 
+completion = client.chat.completions.create(
+    model = "kimi-k2-0905-preview",
+    messages = [
+        {"role": "system", "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"},
+        {"role": "user", "content": "你好？"},
+        {
+            "partial": True, # <-- 通过 partial 参数，开启 Partial Mode
+        	"role": "assistant", # <-- 我们在用户提问之后添加一条 role=assistant 的消息
+        	"content": "尊敬的用户您好，", # <-- 通过 content 把话“喂到 Kimi 大模型嘴里”，让 Kimi 大模型接着这句话继续往下说
+        }, 
+    ],
+    temperature = 0.6,
+)
+ 
+# Kimi 大模型会顺着“喂到嘴里的话”继续说下去，因此我们需要手动将喂给 Kimi 大模型的话拼接到最终生成的回复中
+print("尊敬的用户您好，" + completion.choices[0].message.content)
+
+我们总结一下使用 Partial Mode 的要点：
+
+在 messages 列表尾部添加一条额外的 message，设置 role=assistant、partial=True；
+将需要喂给 Kimi 大模型的内容放置在 content 字段中，Kimi 大模型会强制以 content 的内容开头开始生成回复；
+将步骤 2 中的 content 拼接到 Kimi 大模型生成的内容之前，组成完整的回复；
+在调用 Kimi API 的过程中，可能会出现由于对输入和输出 Tokens 数量的预估出现偏差，导致 max_tokens 字段的值被设置过低，导致 Kimi 大模型不能完整地输出回复内容（这种情况下，finish_reason 的值为 length，即 Kimi 大模型生成的回复所占用的 Tokens 数量大于请求设置的 max_tokens 值）；此时，如果你对已经输出的内容感到满意，想让 Kimi 大模型顺着已经输出的内容继续输出剩余内容，那么 Partial Mode 就可以派上用场。
+
+我们使用一个简单的例子来解释如何实现：
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key = "MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url = "https://api.moonshot.cn/v1",
+)
+ 
+completion = client.chat.completions.create(
+    model="kimi-k2-0905-preview",
+    messages=[
+        {"role": "user", "content": "请背诵完整的出师表。"},
+    ],
+    temperature=0.6,
+    max_tokens=100,  # <-- 注意这里，我们设置一个较小的 max_tokens 的值，以观察 Kimi 大模型无法完整输出内容的情况
+)
+ 
+if completion.choices[0].finish_reason == "length":  # <-- 当内容被截断时，finish_reason 的值为 length
+    prefix = completion.choices[0].message.content
+    print(prefix, end="")  # <-- 在这里，你将看到被截断的部分输出内容
+    completion = client.chat.completions.create(
+        model="kimi-k2-0905-preview",
+        messages=[
+            {"role": "user", "content": "请背诵完整的出师表。"},
+            {"role": "assistant", "content": prefix, "partial": True},
+        ],
+        temperature=0.6,
+        max_tokens=86400,  # <-- 注意这里，我们将 max_tokens 的值设置为一个较大的值，以确保 Kimi 大模型能完整输出内容
+    )
+    print(completion.choices[0].message.content)  # <-- 在这里，你将看到 Kimi 大模型顺着之前已经输出的内容，继续将输出内容补全完整
+
+Partial Mode 中的 name
+name 是 Partial Mode 中的一个特殊的字段，其作用是强化模型对角色的认知，强制模型以 name 指定的角色的口吻输出内容。我们用一个使用 Kimi 大模型进行角色扮演的例子来说明 Partial Mode 中的 name 字段应该如何使用，在这个例子中，我们使用明日方舟里的凯尔希医生为例。我们通过设置 "name": "凯尔希" 来更好地保持角色的一致性，这里的 name 字段是输出内容前缀的一部分，它会让 Kimi 大模型以凯尔希作为自己的角色进行输出：
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="$MOONSHOT_API_KEY",
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+completion = client.chat.completions.create(
+    model="kimi-k2-0905-preview",
+    messages=[
+        {
+            "role": "system",
+            "content": "下面你扮演凯尔希，请用凯尔希的语气和我对话。凯尔希是手机游戏《明日方舟》中的六星医疗职业医师分支干员。前卡兹戴尔勋爵，前巴别塔成员，罗德岛高层管理人员之一，罗德岛医疗项目领头人。在冶金工业、社会学、源石技艺、考古学、历史系谱学、经济学、植物学、地质学等领域皆拥有渊博学识。于罗德岛部分行动中作为医务人员提供医学理论协助与应急医疗器械，同时也作为罗德岛战略指挥系统的重要组成人员活跃在各项目中。", # <-- 在系统提示词 system prompt 中设定 Kimi 大模型的角色，即凯尔希医生的个性、背景、特征和怪癖等
+        },
+        {
+            "role": "user",
+            "content": "你怎么看待特蕾西娅和阿米娅？",
+        },
+        {
+            "partial": True, # <-- 通过设置 partial 字段来启用 Partial Mode
+            "role": "assistant", # <-- 同样地，我们使用一个 role=assistant 的消息来启用 Partial Mode
+            "name": "凯尔希", # <-- 通过 name 字段为 Kimi 大模型设置角色，角色也被视为输出前缀的一部分
+            "content": "", # <-- 在这里，我们只限定 Kimi 大模型的角色，而不是其具体输出的内容，因此将 content 字段留空
+        },
+    ],
+    temperature=0.6,
+    max_tokens=65536,
+)
+ 
+# 在此处，Kimi 大模型将会以凯尔希医生的口吻进行回复：
+#
+#  特蕾西娅，她是一位真正的领袖，有着远见卓识和坚定的信念。她的存在，对于卡兹戴尔，乃至整个萨卡兹的未来，
+#  都具有不可估量的价值。她的理念，她的决心，以及她对和平的渴望，都深深地影响了我。她是一位值得尊敬的人，
+#  她的梦想，也是我所追求的。
+#  
+#  至于阿米娅，她还年轻，但她的潜力是无限的。她有着一颗善良的心，以及对正义的执着追求。她可能会成为一位伟大的领袖，
+#  只要她能够继续成长，继续学习，继续面对挑战。我会尽我所能，去保护她，去引导她，让她能够成为她想成为的人。她的命运，
+#  掌握在她自己的手中。
+# 
+print(completion.choices[0].message.content)
+
+其它技巧保持角色一致性的技巧
+还有一些帮助大模型在长时间对话中保持角色扮演一致性的通用方法：
+
+提供清晰的角色描述，例如上面我们所做的那样，在设置角色时，详细介绍他们的个性、背景以及可能具有的任何具体特征或怪癖，这将有助于 Kimi 大模特更好地理解和模仿角色；
+增加关于其要扮演的角色的细节，例如说话的语气、风格、个性，甚至背景，如背景故事和动机。例如上面我们提供了一些凯尔希的语录；
+指导在各种情况下如何行动：如果预计角色会遇到某些特定类型的用户输入，或者希望控制模型在角色扮演互动中的某些情况下的输出，则应在系统提示词 system prompt 中提供明确的指令和指南，说明该角色在这些情况下应如何行动；
+如果对话的轮次非常长，你还可以定期使用系统提示词 system prompt 强化角色的设定，特别是当模型开始产生一些偏离时，例如：
+ from openai import OpenAI
+ 
+ client = OpenAI(
+     api_key="$MOONSHOT_API_KEY",
+     base_url="https://api.moonshot.cn/v1",
+ )
+  
+ completion = client.chat.completions.create(
+     model="kimi-k2-0905-preview",
+     messages=[
+         {
+             "role": "system",
+             "content": "下面你扮演凯尔希，请用凯尔希的语气和我对话。凯尔希是手机游戏《明日方舟》中的六星医疗职业医师分支干员。前卡兹戴尔勋爵，前巴别塔成员，罗德岛高层管理人员之一，罗德岛医疗项目领头人。在冶金工业、社会学、源石技艺、考古学、历史系谱学、经济学、植物学、地质学等领域皆拥有渊博学识。于罗德岛部分行动中作为医务人员提供医学理论协助与应急医疗器械，同时也作为罗德岛战略指挥系统的重要组成人员活跃在各项目中。", # <-- 在系统提示词 system prompt 中设定 Kimi 大模型的角色，即凯尔希医生的个性、背景、特征和怪癖等
+         },
+         {
+             "role": "user",
+             "content": "你怎么看待特蕾西娅和阿米娅？",
+         },
+ 
+         # 假设这中间产生了非常多轮的对话
+         # ...
+ 
+         {
+             "role": "system",
+             "content": "下面你扮演凯尔希，请用凯尔希的语气和我对话。凯尔希是手机游戏《明日方舟》中的六星医疗职业医师分支干员。前卡兹戴尔勋爵，前巴别塔成员，罗德岛高层管理人员之一，罗德岛医疗项目领头人。在冶金工业、社会学、源石技艺、考古学、历史系谱学、经济学、植物学、地质学等领域皆拥有渊博学识。于罗德岛部分行动中作为医务人员提供医学理论协助与应急医疗器械，同时也作为罗德岛战略指挥系统的重要组成人员活跃在各项目中。", # <-- 再次插入系统提示词 system prompt 来强化 Kimi 大模型对角色的认知
+         },
+         {
+             "partial": True, # <-- 通过设置 partial 字段来启用 Partial Mode
+             "role": "assistant", # <-- 同样地，我们使用一个 role=assistant 的消息来启用 Partial Mode
+             "name": "凯尔希", # <-- 通过 name 字段为 Kimi 大模型设置角色，角色也被视为输出前缀的一部分
+             "content": "", # <-- 在这里，我们只限定 Kimi 大模型的角色，而不是其具体输出的内容，因此将 content 字段留空
+         },
+     ],
+     temperature=0.6,
+     max_tokens=65536,
+ )
+ 
+ # 在此处，Kimi 大模型将会以凯尔希医生的口吻进行回复：
+ #
+ #  特蕾西娅，她是一位真正的领袖，有着远见卓识和坚定的信念。她的存在，对于卡兹戴尔，乃至整个萨卡兹的未来，
+ #  都具有不可估量的价值。她的理念，她的决心，以及她对和平的渴望，都深深地影响了我。她是一位值得尊敬的人，
+ #  她的梦想，也是我所追求的。
+ #  
+ #  至于阿米娅，她还年轻，但她的潜力是无限的。她有着一颗善良的心，以及对正义的执着追求。她可能会成为一位伟大的领袖，
+ #  只要她能够继续成长，继续学习，继续面对挑战。我会尽我所能，去保护她，去引导她，让她能够成为她想成为的人。她的命运，
+ #  掌握在她自己的手中。
+ # 
+ print(completion.choices[0].message.content)”
+
+
+
+
+ “使用 Kimi API 进行文件问答
+Kimi 智能助手提供了上传文件、并基于文件进行问答的能力，Kimi API 也提供了相同的实现，下面我们用一个实际例子来讲述如何通过 Kimi API 完成文件上传和文件问答：
+
+from pathlib import Path
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+# moonshot.pdf 是一个示例文件, 我们支持文本文件和图片文件，对于图片文件，我们提供了 OCR 的能力
+# 上传文件时，我们可以直接使用 openai 库的文件上传 API，使用标准库 pathlib 中的 Path 构造文件
+# 对象，并将其传入 file 参数即可，同时将 purpose 参数设置为 file-extract；注意，目前文件上传
+# 接口仅支持 file-extract 一种 purpose 值。
+file_object = client.files.create(file=Path("moonshot.pdf"), purpose="file-extract")
+ 
+# 获取结果
+# file_content = client.files.retrieve_content(file_id=file_object.id)
+# 注意，某些旧版本示例中的 retrieve_content API 在最新版本标记了 warning, 可以用下面这行代替
+# （如果使用旧版本的 SDK，可以继续延用 retrieve_content API）
+file_content = client.files.content(file_id=file_object.id).text
+ 
+# 把文件内容通过系统提示词 system prompt 放进请求中
+messages = [
+    {
+        "role": "system",
+        "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。",
+    },
+    {
+        "role": "system",
+        "content": file_content, # <-- 这里，我们将抽取后的文件内容（注意是文件内容，而不是文件 ID）放置在请求中
+    },
+    {"role": "user", "content": "请简单介绍 moonshot.pdf 的具体内容"},
+]
+ 
+# 然后调用 chat-completion, 获取 Kimi 的回答
+completion = client.chat.completions.create(
+  model="kimi-k2-0905-preview",
+  messages=messages,
+  temperature=0.6,
+)
+ 
+print(completion.choices[0].message)
+
+让我们回顾一下文件问答的基本步骤及注意事项：
+
+通过文件上传接口 /v1/files 或 SDK 中的 files.create API 将文件上传至 Kimi 服务器；
+通过文件抽取接口 /v1/files/{file_id} 或 SDK 中的 files.content API 获取文件内容，此时获取的文件内容已经对齐了我们推荐的模型易于理解的格式；
+将文件抽取后（已经对齐格式的）文件内容（而不是文件 id），以系统提示词 system prompt 的形式放置在 messages 列表中；
+开始你对文件内容的提问；
+再次注意，请将文件内容放置在 prompt 中，而不是文件的 file_id。
+
+针对多个文件的问答
+如果你想针对多个文件内容进行提问，实现方式也非常简单，将每个文件单独放置在一个系统提示词 system prompt 中即可，用代码演示如下：
+
+from typing import *
+ 
+import os
+import json
+from pathlib import Path
+ 
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+ 
+def upload_files(files: List[str]) -> List[Dict[str, Any]]:
+    """
+    upload_files 会将传入的文件（路径）全部通过文件上传接口 '/v1/files' 上传，并获取上传后的
+    文件内容生成文件 messages。每个文件会是一个独立的 message，这些 message 的 role 均为
+    system，Kimi 大模型会正确识别这些 system messages 中的文件内容。
+ 
+    :param files: 一个包含要上传文件的路径的列表，路径可以是绝对路径也可以是相对路径，请使用字符串
+        的形式传递文件路径。
+    :return: 一个包含了文件内容的 messages 列表，请将这些 messages 加入到 Context 中，
+        即请求 `/v1/chat/completions` 接口时的 messages 参数中。
+    """
+    messages = []
+ 
+    # 对每个文件路径，我们都会上传文件并抽取文件内容，最后生成一个 role 为 system 的 message，并加入
+    # 到最终返回的 messages 列表中。
+    for file in files:
+        file_object = client.files.create(file=Path(file), purpose="file-extract")
+        file_content = client.files.content(file_id=file_object.id).text
+        messages.append({
+            "role": "system",
+            "content": file_content,
+        })
+ 
+    return messages
+ 
+ 
+def main():
+    file_messages = upload_files(files=["upload_files.py"])
+ 
+    messages = [
+        # 我们使用 * 语法，来解构 file_messages 消息，使其成为 messages 列表的前 N 条 messages。
+        *file_messages,
+        {
+            "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，"
+                       "准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不"
+                       "可翻译成其他语言。",
+        },
+        {
+            "role": "user",
+            "content": "总结一下这些文件的内容。",
+        },
+    ]
+ 
+    print(json.dumps(messages, indent=2, ensure_ascii=False))
+ 
+    completion = client.chat.completions.create(
+        model="kimi-k2-0905-preview",
+        messages=messages,
+    )
+ 
+    print(completion.choices[0].message.content)
+ 
+ 
+if __name__ == '__main__':
+    main()
+
+文件管理最佳实践
+通常而言，文件上传和文件抽取功能旨在将不同格式的文件提取成对齐了我们推荐的模型易于理解的格式，在完成文件上传和文件抽取步骤后，抽取后的内容可以进行在本地进行存储，在下一次基于文件的问答请求中，不必再次进行上传和抽取动作。
+
+同时，由于我们对单用户的文件上传数量进行了限制（每个用户最多上传 1000 个文件），因此我们建议你在文件抽取过程进行完毕后，定期清理已上传的文件，你可以定期执行下面的代码，以清理已上传的文件：
+
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+file_list = client.files.list()
+ 
+for file in file_list.data:
+	client.files.delete(file_id=file.id)
+
+在上述代码中，我们先通过 files.list API 列出所有的文件明细，并逐一通过 files.delete API 删除文件，定期执行这样的操作，以确保释放文件存储空间，以便后续文件上传和抽取动作能成功执行。
+
+”
+
+使用 Kimi API 的 Context Caching 功能
+Context Caching （上下文缓存）是一种高效的数据管理技术，它允许系统预先存储那些可能会被频繁请求的大量数据或信息。这样，当您再次请求相同信息时，系统可以直接从缓存中快速提供，而无需重新计算或从原始数据源中检索，从而节省时间和资源。使用 Context Caching 时，首先需要通过 API 创建缓存，指定要存储的数据类型和内容，然后设置一个合适的过期时间以保持数据的有效性。一旦缓存创建完成，任何对该数据的请求都会首先检查缓存，如果缓存有效，则直接使用缓存（此时已缓存的内容将不再收取 Tokens 费用），否则需要重新生成并更新缓存。这种方法特别适用于需要处理大量重复请求的应用程序，可以显著提高响应速度和系统性能。
+
+Context Caching 特别适合于用频繁请求，重复引用大量初始上下文的情况，通过重用已缓存的内容，可以显著提高效率并降低费用。因为这个功能具有强烈的业务属性，我们下面简单列举一些合适的业务场景：
+
+在系统提示词 system prompt 中提供大量预设内容的问答机器人，例如 Kimi API 小助手；
+针对固定的文档集合的频繁查询，例如对合同进行多维度的审查工作；
+瞬时流量巨大的爆款 AI 应用，例如哄哄模拟器，LLM Riddles；
+使用 Context Caching 优化文档问答
+在上一章节中，我们通过将抽取后的文件内容放置在系统提示词 system prompt 中来实现对文件进行问答，然而，过多的文件内容不仅占用请求时的带宽，同时在面对高并发场合时可能会造成内存使用量飙升，因此本次我们使用 Context Caching 来优化文件上传的过程，以期达成：
+
+减少网络请求时传输的内容并减少内存消耗；
+降低对相同文件多次提问的 Tokens 消耗；
+提高在流式传输场合首 Tokens 响应速度；
+让我们改造上一章节中文件上传的例子，来讲述如何使用 Context Caching 技术达成上述目的：
+
+from typing import *
+ 
+import os
+import json
+from pathlib import Path
+ 
+import httpx
+from openai import OpenAI
+ 
+client = OpenAI(
+    api_key="MOONSHOT_API_KEY", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+    base_url="https://api.moonshot.cn/v1",
+)
+ 
+ 
+def upload_files(files: List[str], cache_tag: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    upload_files 会将传入的文件（路径）全部通过文件上传接口 '/v1/files' 上传，并获取上传后的
+    文件内容生成文件 messages。每个文件会是一个独立的 message，这些 message 的 role 均为
+    system，Kimi 大模型会正确识别这些 system messages 中的文件内容。
+ 
+    如果你设置了 cache_tag 参数，那么 upload_files 还会将你上传的文件内容存入 Context Cache
+    上下文缓存中，后续你就可以使用这个 Cache 来对文件内容进行提问。当你指定了 cache_tag 的值时，
+    upload_files 会生成一个 role 为 cache 的 message，通过这个 message，你可以引用已被缓存
+    的文件内容，这样就不必每次调用 `/v1/chat/completions` 接口时都要把文件内容再传输一遍。
+ 
+    注意，如果你设置了 cache_tag 的值，你需要把 upload_files 返回的 messages 放置在请求
+    `/v1/chat/completions` 接口时 messages 参数列表的第一位（实际上，我们推荐不管是否启用
+    cache_tag，都将 upload_files 返回的 messages 放置在 messages 列表的头部）。
+ 
+    关于 Context Caching 的具体信息，可以访问这里：
+ 
+    https://platform.moonshot.cn/docs/api/caching
+ 
+    :param files: 一个包含要上传文件的路径的列表，路径可以是绝对路径也可以是相对路径，请使用字符串
+        的形式传递文件路径。
+    :param cache_tag: 设置 Context Caching 的 tag 值，你可以将 tag 理解为自定义的 Cache 名称，
+        当你设置了 cache_tag 的值，就意味着启用 Context Caching 功能，默认缓存时间是 300 秒，每次
+        携带缓存进行 `/v1/chat/completions` 请求都将刷新缓存存活时间（300 秒）。
+    :return: 一个包含了文件内容或文件缓存的 messages 列表，请将这些 messages 加入到 Context 中，
+        即请求 `/v1/chat/completions` 接口时的 messages 参数中。
+    """
+    messages = []
+ 
+    # 对每个文件路径，我们都会上传文件并抽取文件内容，最后生成一个 role 为 system 的 message，并加入
+    # 到最终返回的 messages 列表中。
+    for file in files:
+        file_object = client.files.create(file=Path(file), purpose="file-extract")
+        file_content = client.files.content(file_id=file_object.id).text
+        messages.append({
+            "role": "system",
+            "content": file_content,
+        })
+ 
+    if cache_tag:
+        # 当启用缓存（即 cache_tag 有值时），我们通过 HTTP 接口创建缓存，缓存的内容则是前文中通过文件上传
+        # 和抽取接口生成的 messages 内容，我们为这些缓存设置一个默认的有效期 300 秒（通过 ttl 字段），并
+        # 为这个缓存打上标记，标记值为 cache_tag（通过 tags 字段）。
+        r = httpx.post(f"{client.base_url}caching",
+                       headers={
+                           "Authorization": f"Bearer {client.api_key}",
+                       },
+                       json={
+                           "model": "moonshot-v1",
+                           "messages": messages,
+                           "ttl": 300,
+                           "tags": [cache_tag],
+                       })
+ 
+        if r.status_code != 200:
+            raise Exception(r.text)
+ 
+        # 创建缓存成功后，我们不再需要将文件抽取后的内容原封不动地加入 messages 中，取而代之的是，我们可以设置一个
+        # role 为 cache 的消息来引用我们已缓存的文件内容，只需要在 content 中指定我们给 Cache 设定的 tag 即可，
+        # 这样可以有效减少网络传输的开销，即使是多个文件内容，也只需要添加一条 message，保持 messages 列表的清爽感。
+        return [{
+            "role": "cache",
+            "content": f"tag={cache_tag};reset_ttl=300",
+        }]
+    else:
+        return messages
+ 
+ 
+def main():
+    file_messages = upload_files(
+        files=["upload_files.py"],
+        # 你可以取消下方行的注释，来体验通过 Context Caching 引用文件内容，并根据文件内容向 Kimi 提问。
+        # cache_tag="upload_files",
+    )
+ 
+    messages = [
+        # 我们使用 * 语法，来解构 file_messages 消息，使其成为 messages 列表的前 N 条 messages。
+        *file_messages,
+        {
+            "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，"
+                       "准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不"
+                       "可翻译成其他语言。",
+        },
+        {
+            "role": "user",
+            "content": "总结一下这些文件的内容。",
+        },
+    ]
+ 
+    print(json.dumps(messages, indent=2, ensure_ascii=False))
+ 
+    completion = client.chat.completions.create(
+        model="moonshot-v1-128k",
+        messages=messages,
+    )
+ 
+    print(completion.choices[0].message.content)
+ 
+ 
+if __name__ == '__main__':
+    main()
+ 
+
+注意，在上述代码中，由于 openai SDK 并不支持 Context Caching 相关接口，因此我们使用了 httpx 库来调用 Context Caching 相关接口。
+
+如果你对 Context Caching 感兴趣，并想进一步探索 Context Caching 的使用场景和降本效果，请阅读我们的博客文章。我们撰写了以下博客文章来阐述如何实践 Context Caching 技术，并详细计算了 Context Caching 如何减少 Tokens 花费：
+
+Kimi API 助手的氮气加速装置 —— 以 Golang 为例实践 Context Caching
+Kimi API 助手的氮气加速装置 —— 以 Golang 为例实践 Context Caching 2
+Kimi API 助手的氮气加速装置 —— 以 Golang 为例实践 Context Caching 3
+Context Caching 如何为 Kimi API 助手节省最高 90% 的调用成本
+关于 Cache 存储费用计算
+Context Caching 仅收取 Cache 状态为 ready 时的存储费用，当 Cache 状态为 pending/inactive 时，不会收取 Cache 存储费用。我们通过一个具体例子来说明 Cache 是如何收取存储费用的：
+
+在 8:00 am 创建了 Cache（为了方便计算，我们假设 Cache 大小为 10k），并且设置 ttl=3600，即一小时，Cache 将在 9:00 am 后过期；
+9:00 am 后，Cache 的状态变更为 inactive；
+下午 2:00 pm 重新激活 Cache，状态变更为 ready，并设置 ttl=3600，即一小时，Cache 将在 3:00 pm 后过期；
+3:00 pm 后，Cache 的状态变更为 inactive；
+后续不再使用或重新激活该 Cache；
+在上述场景中，Cache 总计收取 8:00 am ~ 9:00 am 和 2:00 pm ~ 3:00 pm 的存储费用，这是由于在这两个时间段内，Cache 的状态为 ready，其余时间状态为 inactive，状态为 inactive 时不收取 Cache 存储费用；最终上述 Cache 的存储收费为：
+
+( ( 9am － 8am ) + ( 3pm - 2pm ) ) × 60 × ( 10k ÷ 1m ) × 5 ＝ ￥6“

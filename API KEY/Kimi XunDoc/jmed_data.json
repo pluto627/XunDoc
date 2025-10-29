@@ -1,0 +1,138 @@
+{
+  "medical_data": {
+    "hospital_info": {
+      "name": "智慧医疗中心",
+      "location": "北京市朝阳区",
+      "departments": [
+        "心血管科",
+        "神经内科", 
+        "肿瘤科",
+        "急诊科",
+        "儿科"
+      ],
+      "established_year": 2010,
+      "total_beds": 500
+    },
+    "patient_statistics": {
+      "total_patients_2024": 15680,
+      "monthly_data": [
+        {"month": "2024-01", "patients": 1200, "emergency_cases": 180},
+        {"month": "2024-02", "patients": 1150, "emergency_cases": 165},
+        {"month": "2024-03", "patients": 1300, "emergency_cases": 195},
+        {"month": "2024-04", "patients": 1280, "emergency_cases": 175},
+        {"month": "2024-05", "patients": 1350, "emergency_cases": 210},
+        {"month": "2024-06", "patients": 1400, "emergency_cases": 220},
+        {"month": "2024-07", "patients": 1450, "emergency_cases": 235},
+        {"month": "2024-08", "patients": 1380, "emergency_cases": 200},
+        {"month": "2024-09", "patients": 1320, "emergency_cases": 185},
+        {"month": "2024-10", "patients": 1250, "emergency_cases": 170},
+        {"month": "2024-11", "patients": 1180, "emergency_cases": 155},
+        {"month": "2024-12", "patients": 1416, "emergency_cases": 190}
+      ]
+    },
+    "department_performance": {
+      "cardiovascular": {
+        "total_cases": 3500,
+        "success_rate": 0.95,
+        "average_stay_days": 7.2,
+        "equipment": ["心电图机", "超声心动图", "冠脉造影机"],
+        "staff_count": 25
+      },
+      "neurology": {
+        "total_cases": 2800,
+        "success_rate": 0.92,
+        "average_stay_days": 9.5,
+        "equipment": ["MRI", "CT", "脑电图机"],
+        "staff_count": 20
+      },
+      "oncology": {
+        "total_cases": 2200,
+        "success_rate": 0.88,
+        "average_stay_days": 12.3,
+        "equipment": ["放疗机", "化疗设备", "PET-CT"],
+        "staff_count": 30
+      },
+      "emergency": {
+        "total_cases": 2280,
+        "success_rate": 0.97,
+        "average_stay_days": 2.1,
+        "equipment": ["急救车", "除颤器", "呼吸机"],
+        "staff_count": 35
+      },
+      "pediatrics": {
+        "total_cases": 4900,
+        "success_rate": 0.96,
+        "average_stay_days": 4.8,
+        "equipment": ["儿童专用设备", "疫苗冷链", "新生儿监护仪"],
+        "staff_count": 28
+      }
+    },
+    "financial_summary": {
+      "total_revenue_2024": 125000000,
+      "operating_costs": 98000000,
+      "profit_margin": 0.216,
+      "insurance_coverage": {
+        "public_insurance": 0.65,
+        "private_insurance": 0.25,
+        "self_pay": 0.10
+      },
+      "cost_breakdown": {
+        "staff_salaries": 0.45,
+        "equipment_maintenance": 0.20,
+        "medications": 0.15,
+        "utilities": 0.08,
+        "administration": 0.12
+      }
+    },
+    "quality_metrics": {
+      "patient_satisfaction": 4.3,
+      "readmission_rate": 0.08,
+      "infection_rate": 0.02,
+      "mortality_rate": 0.015,
+      "average_wait_time_minutes": 35,
+      "staff_turnover_rate": 0.12
+    },
+    "technology_adoption": {
+      "electronic_health_records": true,
+      "telemedicine_available": true,
+      "ai_diagnosis_tools": [
+        "影像AI辅助诊断",
+        "药物相互作用检查",
+        "风险评估算法"
+      ],
+      "digital_systems": [
+        "预约系统",
+        "移动支付",
+        "远程监护",
+        "智能病房管理"
+      ]
+    },
+    "research_activities": {
+      "ongoing_trials": 15,
+      "published_papers_2024": 28,
+      "research_partnerships": [
+        "清华大学医学院",
+        "北京协和医学院",
+        "中科院生物物理所"
+      ],
+      "research_funding": 8500000,
+      "patent_applications": 5
+    }
+  },
+  "analysis_requests": [
+    "分析医院各科室的运营效率",
+    "评估患者满意度与财务表现的关系",
+    "识别2024年就诊趋势和季节性模式",
+    "比较各科室的成本效益",
+    "预测未来发展方向和改进建议"
+  ],
+  "metadata": {
+    "data_source": "智慧医疗中心信息系统",
+    "last_updated": "2024-12-20",
+    "data_quality": "高质量",
+    "confidentiality_level": "内部使用",
+    "version": "1.0"
+  }
+}
+
+

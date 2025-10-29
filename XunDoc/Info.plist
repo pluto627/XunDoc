@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>XunDoc 需要访问相机以监控点滴速度并帮助您准确计算剩余时间。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>XunDoc 需要访问您的位置以搜索附近的医院。</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>XunDoc 需要访问麦克风以录制医疗笔记和问诊对话。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>XunDoc 需要访问相册以保存和读取医疗报告照片。</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>XunDoc 需要使用语音识别功能将您的录音转换为文字，方便查看和检索。</string>
+</dict>
+</plist>

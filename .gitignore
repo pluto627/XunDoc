@@ -1,0 +1,25 @@
+# Xcode
+.DS_Store
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+DerivedData/
+build/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# CocoaPods
+Pods/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Other
+*.swp
+*~
+.Trashes
+

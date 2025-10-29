@@ -1,0 +1,465 @@
+/* 
+  Localizable.strings (English)
+  XunDoc
+
+  Created by pluto guo on 9/15/25.
+*/
+
+// MARK: - General
+"app_name" = "XunDoc";
+"cancel" = "Cancel";
+"save" = "Save";
+"done" = "Done";
+"edit" = "Edit";
+"delete" = "Delete";
+"add" = "Add";
+"search" = "Search";
+"share" = "Share";
+"export" = "Export";
+"view_all" = "View All";
+"show_more" = "Show More";
+"show_less" = "Show Less";
+"yes" = "Yes";
+"no" = "No";
+"ok" = "OK";
+"confirm" = "Confirm";
+"back" = "Back";
+"next" = "Next";
+
+// MARK: - Tab Bar
+"tab_home" = "Home";
+"tab_ai_consultation" = "AI Consult";
+"tab_health_records" = "Records";
+"tab_chronic_disease" = "Chronic";
+"tab_iv_drip" = "IV Drip";
+
+// MARK: - Home View
+"quick_actions" = "Quick Actions";
+"action_photo_diagnosis" = "Photo Diagnosis";
+"action_add_record" = "Add Record";
+"action_medication_reminder" = "Med Reminder";
+"action_health_data" = "Health Data";
+"health_overview" = "Health Overview";
+"no_health_data" = "No health data yet";
+"recent_records" = "Recent Records";
+"no_recent_records" = "No recent records";
+"medication_reminders" = "Medication Reminders";
+"no_medication_reminders" = "No medication reminders";
+"add_member" = "Add Member";
+"add_family_member" = "Add Family Member";
+
+// MARK: - Family Member
+"name" = "Name";
+"relationship" = "Relationship";
+"birth_date" = "Birth Date";
+"gender" = "Gender";
+"gender_male" = "Male";
+"gender_female" = "Female";
+"gender_other" = "Other";
+"blood_type_optional" = "Blood Type (Optional)";
+"allergies" = "Allergies";
+"add_allergy" = "Add Allergy";
+"chronic_diseases" = "Chronic Diseases";
+"add_chronic_disease" = "Add Chronic Disease";
+"basic_info" = "Basic Information";
+
+// MARK: - AI Consultation
+"ai_consultation" = "AI Consultation";
+"consultation_skin" = "Skin Analysis";
+"consultation_symptom" = "Symptom Analysis";
+"consultation_report" = "Report Reading";
+"consultation_medication" = "Medication Guide";
+"select_photo" = "Select Photo";
+"take_photo" = "Take Photo";
+"choose_photo" = "Choose from Library";
+"describe_symptoms" = "Describe Symptoms";
+"enter_symptom" = "Enter symptom...";
+"describe_symptoms_detail" = "Describe Your Symptoms in Detail";
+"symptom_analysis_hint" = "Please describe your symptoms as detailed as possible for more accurate analysis.";
+"paste_report" = "Paste or Type Report Content";
+"scan_report_hint" = "You can also take a photo of your report for analysis";
+"medication_name" = "Medication Name";
+"enter_medication_name" = "Enter medication name...";
+"usage_condition" = "Usage Condition";
+"enter_condition" = "Enter your condition...";
+"medication_guidance_hint" = "Get professional guidance on medication usage and precautions.";
+"analyzing" = "Analyzing...";
+"start_analysis" = "Start Analysis";
+"consultation_history" = "Consultation History";
+"no_consultation_history" = "No consultation history yet";
+"ai_analysis_failed" = "Analysis failed, please try again";
+
+// MARK: - Analysis Result
+"analysis_result" = "Analysis Result";
+"ai_analysis" = "AI Analysis";
+"possible_conditions" = "Possible Conditions";
+"probability" = "Probability";
+"symptom_description" = "Symptom Description";
+"recommendations" = "Recommendations";
+"daily_care" = "Daily Care";
+"medical_attention_needed" = "Medical Attention Recommended";
+"medical_attention_desc" = "Please consult a healthcare professional for proper diagnosis";
+"book_appointment" = "Book Appointment";
+
+// MARK: - Health Records
+"health_records" = "Health Records";
+"search_records" = "Search records...";
+"all_types" = "All Types";
+"sort_latest_first" = "Latest First";
+"sort_oldest_first" = "Oldest First";
+"sort_by_type" = "By Type";
+"no_health_records" = "No Health Records Yet";
+"no_health_records_desc" = "Start adding your medical records for better health management";
+"add_first_record" = "Add First Record";
+"add_record" = "Add Record";
+"record_title" = "Record Title";
+"record_type" = "Record Type";
+"record_date" = "Record Date";
+"description" = "Description";
+"tags" = "Tags";
+"add_tag" = "Add tag...";
+"attachments" = "Attachments";
+"add_photo" = "Add Photo";
+"record_detail" = "Record Detail";
+
+// MARK: - Record Types
+"record_outpatient" = "Outpatient";
+"record_emergency" = "Emergency";
+"record_inpatient" = "Inpatient";
+"record_physical" = "Physical";
+"record_other" = "Other";
+"record_medical_report" = "Medical Report";
+"record_prescription" = "Prescription";
+"record_lab_result" = "Lab Result";
+"record_imaging" = "Imaging";
+"record_vaccination" = "Vaccination";
+
+// MARK: - Chronic Disease
+"chronic_disease_management" = "Chronic Disease Management";
+"time_range_day" = "Today";
+"time_range_week" = "This Week";
+"time_range_month" = "This Month";
+"time_range_year" = "This Year";
+"trend_chart" = "Trend Chart";
+"no_data_yet" = "No Data Yet";
+"start_tracking" = "Start tracking";
+"add_first_data" = "Add First Data";
+"statistics" = "Statistics";
+"average" = "Average";
+"latest" = "Latest";
+"maximum" = "Maximum";
+"minimum" = "Minimum";
+"recent_data" = "Recent Data";
+"no_recent_data" = "No recent data";
+"medication_schedule" = "Medication Schedule";
+"no_active_medications" = "No active medications";
+"add_data" = "Add Data";
+"add_medication_reminder" = "Add Medication Reminder";
+"add_health_data" = "Add Health Data";
+"data_type" = "Data Type";
+"type" = "Type";
+"measurement" = "Measurement";
+"enter_value" = "Enter value...";
+"date_time" = "Date & Time";
+"notes_optional" = "Notes (Optional)";
+"add_notes" = "Add notes...";
+"medication_info" = "Medication Information";
+"dosage" = "Dosage";
+"frequency" = "Frequency";
+"schedule" = "Schedule";
+"start_date" = "Start Date";
+"has_end_date" = "Has End Date";
+"end_date" = "End Date";
+"all_medications" = "All Medications";
+"no_medications" = "No medications";
+
+// MARK: - Disease Types
+"disease_blood_pressure" = "Blood Pressure";
+"disease_blood_sugar" = "Blood Sugar";
+"disease_heart_rate" = "Heart Rate";
+"disease_weight" = "Weight";
+"disease_temperature" = "Temperature";
+"disease_oxygen" = "Oxygen Saturation";
+
+// MARK: - Medication Frequency
+"frequency_once_daily" = "Once Daily";
+"frequency_twice_daily" = "Twice Daily";
+"frequency_three_times_daily" = "Three Times Daily";
+"frequency_four_times_daily" = "Four Times Daily";
+"frequency_as_needed" = "As Needed";
+
+// MARK: - IV Drip Monitor
+"iv_drip_monitor" = "IV Drip Monitor";
+"monitoring_active" = "Monitoring Active";
+"monitoring_inactive" = "Monitoring Inactive";
+"drip_rate" = "Drip Rate";
+"drops_per_minute" = "drops/min";
+"dpm" = "dpm";
+"estimated_time_remaining" = "Estimated Time Remaining";
+"hours_minutes_format" = "%dh %dm";
+"minutes_format" = "%d minutes";
+"adjust_camera" = "Adjust Camera";
+"stop_monitoring" = "Stop Monitoring";
+"live_monitoring_data" = "Live Monitoring Data";
+"total_drops" = "Total Drops";
+"current_rate" = "Current Rate";
+"elapsed_time" = "Elapsed Time";
+"progress" = "Progress";
+"camera_view" = "Camera View";
+"camera_not_available" = "Camera not available";
+"camera_hint" = "Position camera to capture drip chamber clearly";
+"setup_monitoring" = "Setup Monitoring";
+"volume_ml" = "Volume (ml)";
+"manual_drip_rate" = "Manual Drip Rate Input";
+"start_manual_monitoring" = "Start Manual Monitoring";
+"start_video_monitoring" = "Start Video Monitoring";
+"iv_drip_instruction_1" = "Position camera to clearly see drip chamber";
+"iv_drip_instruction_2" = "Ensure good lighting conditions";
+"iv_drip_instruction_3" = "Keep device stable during monitoring";
+"active_sessions" = "Active Sessions";
+"no_active_sessions" = "No active sessions";
+"recent_history" = "Recent History";
+"no_history" = "No history";
+"drip_history" = "Drip History";
+"no_drip_history" = "No drip history";
+"completed" = "Completed";
+"in_progress" = "In Progress";
+"volume" = "Volume";
+"rate" = "Rate";
+
+// MARK: - Severity Levels
+"severity_low" = "Low";
+"severity_medium" = "Medium";
+"severity_high" = "High";
+"severity_urgent" = "Urgent";
+
+// MARK: - Trends
+"trend_increasing" = "trending up";
+"trend_decreasing" = "trending down";
+"trend_stable" = "stable";
+
+// MARK: - Errors
+"error_invalid_url" = "Invalid URL";
+"error_request_failed" = "Request failed";
+"error_invalid_response" = "Invalid response";
+"error_image_processing" = "Image processing failed";
+
+// MARK: - Chat History
+"chat_history" = "Chat History";
+"new_conversation" = "New Conversation";
+"no_messages" = "No messages";
+"delete_conversation" = "Delete Conversation";
+"delete_conversation_message" = "Are you sure you want to delete this conversation? This action cannot be undone.";
+"clear_conversation" = "Clear Current Conversation";
+"no_chat_history" = "No Chat History";
+"no_chat_history_desc" = "Start a new conversation and all content will be automatically saved";
+
+// MARK: - Default Member
+"default_member" = "Me";
+"self" = "Self";
+"no_family_members" = "No Family Members Yet";
+"add_family_member_desc" = "Add family members to start using health management features";
+"add_first_member" = "Add First Member";
+
+// MARK: - HomeView
+"family_members" = "Family";
+"add_button" = "Add";
+"quick_actions_title" = "Quick Actions";
+"add_record_button" = "Add Record";
+"medication_button" = "Medication";
+"vitals_button" = "Vitals";
+"documents_button" = "Documents";
+"ai_doctor" = "AI Doctor";
+"health_overview_title" = "Health Overview";
+"details_button" = "Details";
+"blood_pressure_title" = "Blood Pressure";
+"glucose_level_title" = "Glucose Level";
+"normal_status" = "Normal";
+"good_status" = "Good";
+"today_reminders_title" = "Today's Reminders";
+"no_reminders_today" = "No reminders for today";
+"take_medication_reminder" = "Take medication";
+"check_blood_pressure_reminder" = "Check blood pressure";
+
+// MARK: - ChatConsultationView
+"ai_doctor_name" = "AI Doctor";
+"ai_analyzing_message" = "AI Doctor is analyzing...";
+"welcome_greeting" = "👋 Hello! I'm your AI health assistant";
+"welcome_features" = "You can:\n• 📸 Send symptom photos for analysis\n• 💬 Describe symptoms for advice\n• 📋 Upload reports for interpretation\n• 💊 Ask about medications";
+"chat_history_sidebar_title" = "Chat History";
+"new_conversation_button" = "New Conversation";
+"no_chat_records_message" = "No chat records yet";
+"create_new_hint" = "Click the button above to create a new conversation";
+"message_placeholder" = "Message XunDoc...";
+"select_image_title" = "Select Image";
+"take_photo_action" = "Take Photo";
+"from_album_action" = "Choose from Library";
+"cancel_action" = "Cancel";
+"delete_conversation_confirm" = "Are you sure you want to delete this conversation? This action cannot be undone.";
+
+// MARK: - HealthRecordsView
+"medical_records_title" = "Medical Records";
+"add_new_button" = "Add New";
+"main_symptoms_label" = "Main Symptoms:";
+"no_records_title" = "No Health Records Yet";
+"add_first_record_message" = "Add your first medical record\nto start tracking your health history";
+"add_record_action" = "Add Record";
+"visit_info_section" = "Visit Information";
+"hospital_name_field" = "Hospital Name";
+"department_field" = "Department";
+"visit_date_field" = "Visit Date";
+"visit_type_field" = "Visit Type";
+"select_department_placeholder" = "Please select department";
+"main_symptoms_section" = "Main Symptoms (Optional)";
+"symptoms_placeholder" = "Please describe main symptoms";
+"diagnosis_treatment_section" = "Diagnosis & Treatment (Optional)";
+"diagnosis_result_field" = "Diagnosis Result";
+"treatment_plan_field" = "Treatment Plan";
+"reports_section" = "Reports";
+"add_photo_button" = "Add Photo";
+"notes_section" = "Notes (Optional)";
+"add_record_title" = "Add Medical Record";
+"cancel_button" = "Cancel";
+"save_button" = "Save";
+"visit_details_title" = "Visit Details";
+"add_report_action" = "Add Report";
+"add_recording_action" = "Add Recording";
+"recording_title" = "Recording";
+"recording_in_progress" = "Recording...";
+"delete_button" = "Delete";
+"close_button" = "Close";
+"select_hospital_title" = "Select Hospital";
+"search_hospital_placeholder" = "Search hospital";
+"search_nearby_button" = "Search Nearby Hospitals";
+"searching_nearby" = "Searching nearby hospitals...";
+"nearby_hospitals_title" = "Nearby Hospitals";
+"nearby_label" = "Nearby";
+
+// MARK: - ChronicDiseaseView
+"chronic_disease_title" = "Chronic Disease Management";
+"add_health_data_action" = "Add Health Data";
+"add_medication_reminder_action" = "Add Medication Reminder";
+"add_followup_reminder_action" = "Add Follow-up Reminder";
+"all_filter" = "All";
+"medication_filter" = "Medication";
+"followup_filter" = "Follow-up";
+"health_data_filter" = "Health Data";
+"select_member_message" = "Please select a family member first";
+"select_member_hint" = "Select a family member on the home page to start managing health data";
+"medication_reminders_title" = "Medication Reminders";
+"followup_reminders_title" = "Follow-up Reminders";
+"health_data_title" = "Health Data";
+"no_management_data" = "No health management data yet";
+"click_add_hint" = "Click the + button in the upper right corner to add health data, medication or follow-up reminders";
+"medication_info_section" = "Medication Information";
+"medication_name_field" = "Medication Name";
+"dosage_field" = "Dosage (e.g., 1 tablet, 10ml)";
+"frequency_field" = "Frequency (e.g., Three times daily)";
+"reminder_time_section" = "Reminder Time";
+"reminder_time_field" = "Reminder Time";
+"repeat_reminder_toggle" = "Repeat Reminder";
+"repeat_frequency_field" = "Repeat Frequency";
+"add_medication_reminder_title" = "Add Medication Reminder";
+"followup_info_section" = "Follow-up Information";
+"followup_project_field" = "Follow-up Project";
+"hospital_field" = "Hospital Name";
+"doctor_field" = "Doctor Name";
+"notes_field" = "Notes";
+"followup_time_section" = "Follow-up Time";
+"followup_time_field" = "Follow-up Time";
+"add_followup_reminder_title" = "Add Follow-up Reminder";
+
+// MARK: - PhotoDiagnosisView
+"photo_diagnosis_title" = "Photo Diagnosis";
+"ai_photo_diagnosis_title" = "AI Photo Diagnosis";
+"upload_image_description" = "Upload medical images or skin photos for professional AI analysis advice";
+"upload_image_section" = "Upload Image";
+"click_upload_hint" = "Click to upload image";
+"support_formats_hint" = "Supports X-ray, CT, MRI, skin photos, etc.";
+"reselect_button" = "Reselect";
+"photo_action" = "Take Photo";
+"symptom_optional_section" = "Symptom Description (Optional)";
+"describe_symptoms_placeholder" = "Describe related symptoms...";
+"additional_notes_section" = "Additional Notes";
+"start_analysis_button" = "Start AI Analysis";
+"analyzing_progress" = "AI Analyzing...";
+"error_title" = "Error";
+"diagnosis_result_title" = "Diagnosis Result";
+"ai_analysis_result_title" = "AI Analysis Result";
+"professional_advice_title" = "Professional Advice";
+"attention_recommended" = "Medical Attention Recommended";
+"consult_doctor_message" = "It is recommended to consult a professional doctor for further diagnosis and treatment";
+"done_button" = "Done";
+
+// MARK: - MedicalNotificationsView
+"medical_reminders_title" = "Medical Reminders";
+"add_reminder_action" = "Add Reminder";
+"clear_completed_action" = "Clear Completed";
+"today_filter" = "Today";
+"upcoming_filter" = "Upcoming";
+"overdue_filter" = "Overdue";
+"completed_filter" = "Completed";
+"no_reminders_message" = "No reminders yet";
+"no_reminders_today_message" = "No reminders for today";
+"no_upcoming_reminders" = "No upcoming reminders";
+"no_overdue_reminders" = "No overdue reminders";
+"no_completed_reminders" = "No completed reminders yet";
+"click_add_reminder_hint" = "Click the upper right corner to add new medical reminders";
+"completed_status" = "Completed";
+"overdue_days_format" = "Overdue %d days";
+"overdue_hours_format" = "Overdue %d hours";
+"medication_label" = "Medication: %@";
+"dosage_label" = "Dosage: %@";
+"notification_type_section" = "Notification Type";
+"type_field" = "Type";
+"basic_info_section" = "Basic Information";
+"title_field" = "Title";
+"message_field" = "Message Content";
+"time_settings_section" = "Time Settings";
+"priority_section" = "Priority";
+"priority_field" = "Priority";
+"add_reminder_title" = "Add Reminder";
+"edit_reminder_title" = "Edit Reminder";
+"choose_operation" = "Choose Operation";
+"edit_action" = "Edit";
+"disable_reminder" = "Disable Reminder";
+"enable_reminder" = "Enable Reminder";
+"delete_action" = "Delete";
+
+// MARK: - FamilyManagementView
+"family_sharing_title" = "Family Sharing";
+"invite_family_section" = "Invite Family";
+"generate_code_description" = "Generate an invite code to let family members join your health circle and view each other's health data";
+"generate_code_button" = "Generate Invite Code";
+"my_invite_codes_title" = "My Invite Codes";
+"valid_until_format" = "Valid until %@";
+"copied_status" = "Copied";
+"copy_action" = "Copy";
+"invite_code_generated_title" = "Invite Code Generated";
+"share_code_message" = "Share the invite code with your family to join your health circle";
+"valid_period_info" = "Valid for 7 days • 11-digit code";
+"copy_invite_code_button" = "Copy Invite Code";
+"copied_to_clipboard" = "Copied to clipboard";
+"family_members_title" = "Family Members";
+"no_members_message" = "No family members yet";
+"joined_on_format" = "Joined on %@";
+"can_view_data" = "Can view health data";
+"cannot_view_data" = "Cannot view health data";
+"remove_action" = "Remove";
+"confirm_remove_title" = "Confirm Remove";
+"remove_member_format" = "Are you sure you want to remove \"%@\"? You will no longer be able to view each other's health data after removal.";
+"join_with_code_button" = "Join with Invite Code";
+"enter_code_title" = "Enter Invite Code";
+"enter_code_message" = "Enter the 11-digit invite code shared by your family";
+"enter_code_placeholder" = "Enter invite code";
+"join_family_button" = "Join Family";
+"hint_title" = "Hint";
+"join_success_format" = "✅ %@\n\nAutomatically added as a family member.\nYou can now:\n• Select this member on the home page\n• Record health data for them\n• View data recorded for them";
+
+// MARK: - AddHealthDataView
+"add_health_data_title" = "Add Health Data";
+"data_type_section" = "Data Type";
+"value_section" = "Value";
+"record_time_section" = "Record Time";
+"notes_optional_section" = "Notes (Optional)";
+"save_data_button" = "Save Data";

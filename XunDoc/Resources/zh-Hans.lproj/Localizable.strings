@@ -1,0 +1,465 @@
+/* 
+  Localizable.strings (Chinese Simplified)
+  XunDoc
+
+  Created by pluto guo on 9/15/25.
+*/
+
+// MARK: - 通用
+"app_name" = "寻医";
+"cancel" = "取消";
+"save" = "保存";
+"done" = "完成";
+"edit" = "编辑";
+"delete" = "删除";
+"add" = "添加";
+"search" = "搜索";
+"share" = "分享";
+"export" = "导出";
+"view_all" = "查看全部";
+"show_more" = "显示更多";
+"show_less" = "收起";
+"yes" = "是";
+"no" = "否";
+"ok" = "确定";
+"confirm" = "确认";
+"back" = "返回";
+"next" = "下一步";
+
+// MARK: - 标签栏
+"tab_home" = "首页";
+"tab_ai_consultation" = "AI咨询";
+"tab_health_records" = "健康档案";
+"tab_chronic_disease" = "慢病管理";
+"tab_iv_drip" = "点滴监控";
+
+// MARK: - 首页
+"quick_actions" = "快速操作";
+"action_photo_diagnosis" = "拍照诊断";
+"action_add_record" = "添加记录";
+"action_medication_reminder" = "用药提醒";
+"action_health_data" = "健康数据";
+"health_overview" = "健康概览";
+"no_health_data" = "暂无健康数据";
+"recent_records" = "最近记录";
+"no_recent_records" = "暂无最近记录";
+"medication_reminders" = "用药提醒";
+"no_medication_reminders" = "暂无用药提醒";
+"add_member" = "添加成员";
+"add_family_member" = "添加家庭成员";
+
+// MARK: - 家庭成员
+"name" = "姓名";
+"relationship" = "关系";
+"birth_date" = "出生日期";
+"gender" = "性别";
+"gender_male" = "男";
+"gender_female" = "女";
+"gender_other" = "其他";
+"blood_type_optional" = "血型（选填）";
+"allergies" = "过敏史";
+"add_allergy" = "添加过敏源";
+"chronic_diseases" = "慢性病";
+"add_chronic_disease" = "添加慢性病";
+"basic_info" = "基本信息";
+
+// MARK: - AI咨询
+"ai_consultation" = "AI健康咨询";
+"consultation_skin" = "皮肤分析";
+"consultation_symptom" = "症状分析";
+"consultation_report" = "报告解读";
+"consultation_medication" = "用药指导";
+"select_photo" = "选择照片";
+"take_photo" = "拍照";
+"choose_photo" = "从相册选择";
+"describe_symptoms" = "描述症状";
+"enter_symptom" = "输入症状...";
+"describe_symptoms_detail" = "详细描述您的症状";
+"symptom_analysis_hint" = "请尽可能详细地描述您的症状，以便获得更准确的分析结果。";
+"paste_report" = "粘贴或输入报告内容";
+"scan_report_hint" = "您也可以拍照上传报告进行分析";
+"medication_name" = "药物名称";
+"enter_medication_name" = "输入药物名称...";
+"usage_condition" = "使用情况";
+"enter_condition" = "输入您的病情...";
+"medication_guidance_hint" = "获取专业的用药指导和注意事项。";
+"analyzing" = "分析中...";
+"start_analysis" = "开始分析";
+"consultation_history" = "咨询历史";
+"no_consultation_history" = "暂无咨询历史";
+"ai_analysis_failed" = "分析失败，请重试";
+
+// MARK: - 分析结果
+"analysis_result" = "分析结果";
+"ai_analysis" = "AI分析";
+"possible_conditions" = "可能的诊断";
+"probability" = "可能性";
+"symptom_description" = "症状描述";
+"recommendations" = "建议";
+"daily_care" = "日常护理";
+"medical_attention_needed" = "建议就医";
+"medical_attention_desc" = "请咨询专业医生以获得准确诊断";
+"book_appointment" = "预约就诊";
+
+// MARK: - 健康档案
+"health_records" = "健康档案";
+"search_records" = "搜索记录...";
+"all_types" = "全部类型";
+"sort_latest_first" = "最新优先";
+"sort_oldest_first" = "最早优先";
+"sort_by_type" = "按类型";
+"no_health_records" = "暂无健康记录";
+"no_health_records_desc" = "开始添加您的医疗记录，更好地管理健康";
+"add_first_record" = "添加第一条记录";
+"add_record" = "添加记录";
+"record_title" = "记录标题";
+"record_type" = "记录类型";
+"record_date" = "记录日期";
+"description" = "描述";
+"tags" = "标签";
+"add_tag" = "添加标签...";
+"attachments" = "附件";
+"add_photo" = "添加照片";
+"record_detail" = "记录详情";
+
+// MARK: - 记录类型
+"record_outpatient" = "门诊";
+"record_emergency" = "急诊";
+"record_inpatient" = "住院";
+"record_physical" = "体检";
+"record_other" = "其他";
+"record_medical_report" = "诊疗记录";
+"record_prescription" = "处方";
+"record_lab_result" = "化验结果";
+"record_imaging" = "影像检查";
+"record_vaccination" = "疫苗接种";
+
+// MARK: - 慢性病
+"chronic_disease_management" = "慢性病管理";
+"time_range_day" = "今天";
+"time_range_week" = "本周";
+"time_range_month" = "本月";
+"time_range_year" = "本年";
+"trend_chart" = "趋势图";
+"no_data_yet" = "暂无数据";
+"start_tracking" = "开始记录";
+"add_first_data" = "添加第一条数据";
+"statistics" = "统计信息";
+"average" = "平均值";
+"latest" = "最新值";
+"maximum" = "最大值";
+"minimum" = "最小值";
+"recent_data" = "最近数据";
+"no_recent_data" = "暂无最近数据";
+"medication_schedule" = "用药计划";
+"no_active_medications" = "暂无活跃用药";
+"add_data" = "添加数据";
+"add_medication_reminder" = "添加用药提醒";
+"add_health_data" = "添加健康数据";
+"data_type" = "数据类型";
+"type" = "类型";
+"measurement" = "测量值";
+"enter_value" = "输入数值...";
+"date_time" = "日期时间";
+"notes_optional" = "备注（选填）";
+"add_notes" = "添加备注...";
+"medication_info" = "药物信息";
+"dosage" = "剂量";
+"frequency" = "频率";
+"schedule" = "计划";
+"start_date" = "开始日期";
+"has_end_date" = "设置结束日期";
+"end_date" = "结束日期";
+"all_medications" = "全部药物";
+"no_medications" = "暂无药物";
+
+// MARK: - 疾病类型
+"disease_blood_pressure" = "血压";
+"disease_blood_sugar" = "血糖";
+"disease_heart_rate" = "心率";
+"disease_weight" = "体重";
+"disease_temperature" = "体温";
+"disease_oxygen" = "血氧饱和度";
+
+// MARK: - 用药频率
+"frequency_once_daily" = "每日一次";
+"frequency_twice_daily" = "每日两次";
+"frequency_three_times_daily" = "每日三次";
+"frequency_four_times_daily" = "每日四次";
+"frequency_as_needed" = "按需";
+
+// MARK: - 点滴监控
+"iv_drip_monitor" = "点滴监控";
+"monitoring_active" = "监控中";
+"monitoring_inactive" = "未监控";
+"drip_rate" = "滴速";
+"drops_per_minute" = "滴/分钟";
+"dpm" = "滴/分";
+"estimated_time_remaining" = "预计剩余时间";
+"hours_minutes_format" = "%d小时%d分钟";
+"minutes_format" = "%d分钟";
+"adjust_camera" = "调整摄像头";
+"stop_monitoring" = "停止监控";
+"live_monitoring_data" = "实时监控数据";
+"total_drops" = "总滴数";
+"current_rate" = "当前速率";
+"elapsed_time" = "已用时间";
+"progress" = "进度";
+"camera_view" = "摄像头视图";
+"camera_not_available" = "摄像头不可用";
+"camera_hint" = "请将摄像头对准滴液室，确保画面清晰";
+"setup_monitoring" = "设置监控";
+"volume_ml" = "容量（毫升）";
+"manual_drip_rate" = "手动输入滴速";
+"start_manual_monitoring" = "开始手动监控";
+"start_video_monitoring" = "开始视频监控";
+"iv_drip_instruction_1" = "将摄像头对准滴液室，确保画面清晰";
+"iv_drip_instruction_2" = "确保良好的光照条件";
+"iv_drip_instruction_3" = "监控期间保持设备稳定";
+"active_sessions" = "活跃会话";
+"no_active_sessions" = "暂无活跃会话";
+"recent_history" = "最近历史";
+"no_history" = "暂无历史";
+"drip_history" = "点滴历史";
+"no_drip_history" = "暂无点滴历史";
+"completed" = "已完成";
+"in_progress" = "进行中";
+"volume" = "容量";
+"rate" = "速率";
+
+// MARK: - 严重程度
+"severity_low" = "轻度";
+"severity_medium" = "中度";
+"severity_high" = "重度";
+"severity_urgent" = "紧急";
+
+// MARK: - 趋势
+"trend_increasing" = "呈上升趋势";
+"trend_decreasing" = "呈下降趋势";
+"trend_stable" = "保持稳定";
+
+// MARK: - 错误
+"error_invalid_url" = "无效的URL";
+"error_request_failed" = "请求失败";
+"error_invalid_response" = "无效的响应";
+"error_image_processing" = "图片处理失败";
+
+// MARK: - 对话历史
+"chat_history" = "对话历史";
+"new_conversation" = "新对话";
+"no_messages" = "暂无消息";
+"delete_conversation" = "删除对话";
+"delete_conversation_message" = "确定要删除这个对话吗？此操作不可恢复。";
+"clear_conversation" = "清空当前对话";
+"no_chat_history" = "暂无对话历史";
+"no_chat_history_desc" = "开始一个新的对话，所有内容都会自动保存";
+
+// MARK: - 默认成员
+"default_member" = "我";
+"self" = "本人";
+"no_family_members" = "还没有家庭成员";
+"add_family_member_desc" = "添加家庭成员来开始使用健康管理功能";
+"add_first_member" = "添加第一个成员";
+
+// MARK: - HomeView 首页
+"family_members" = "家庭成员";
+"add_button" = "添加";
+"quick_actions_title" = "快速操作";
+"add_record_button" = "添加记录";
+"medication_button" = "用药提醒";
+"vitals_button" = "生命体征";
+"documents_button" = "医疗文档";
+"ai_doctor" = "AI 医生";
+"health_overview_title" = "健康概览";
+"details_button" = "详情";
+"blood_pressure_title" = "血压";
+"glucose_level_title" = "血糖水平";
+"normal_status" = "正常";
+"good_status" = "良好";
+"today_reminders_title" = "今日提醒";
+"no_reminders_today" = "今天没有提醒事项";
+"take_medication_reminder" = "服药提醒";
+"check_blood_pressure_reminder" = "测量血压";
+
+// MARK: - ChatConsultationView 对话
+"ai_doctor_name" = "AI 医生";
+"ai_analyzing_message" = "AI 医生正在分析...";
+"welcome_greeting" = "👋 您好！我是您的AI健康助手";
+"welcome_features" = "您可以：\n• 📸 发送症状照片进行分析\n• 💬 描述症状获取建议\n• 📋 上传报告进行解读\n• 💊 咨询用药问题";
+"chat_history_sidebar_title" = "对话历史";
+"new_conversation_button" = "新建对话";
+"no_chat_records_message" = "暂无对话记录";
+"create_new_hint" = "点击上方按钮创建新对话";
+"message_placeholder" = "Message XunDoc...";
+"select_image_title" = "选择图片";
+"take_photo_action" = "拍照";
+"from_album_action" = "从相册选择";
+"cancel_action" = "取消";
+"delete_conversation_confirm" = "确定要删除这个对话吗？此操作无法撤销。";
+
+// MARK: - HealthRecordsView 健康档案
+"medical_records_title" = "就诊记录";
+"add_new_button" = "新增";
+"main_symptoms_label" = "主要症状：";
+"no_records_title" = "暂无健康档案";
+"add_first_record_message" = "添加您的第一条就诊记录\n开始追踪您的健康历史";
+"add_record_action" = "添加记录";
+"visit_info_section" = "就诊信息";
+"hospital_name_field" = "医院名称";
+"department_field" = "科室";
+"visit_date_field" = "就诊日期";
+"visit_type_field" = "就诊类型";
+"select_department_placeholder" = "请选择科室";
+"main_symptoms_section" = "主要症状（可选）";
+"symptoms_placeholder" = "请描述主要症状";
+"diagnosis_treatment_section" = "诊断和治疗（可选）";
+"diagnosis_result_field" = "诊断结果";
+"treatment_plan_field" = "治疗方案";
+"reports_section" = "报告";
+"add_photo_button" = "添加照片";
+"notes_section" = "备注（可选）";
+"add_record_title" = "新增就诊记录";
+"cancel_button" = "取消";
+"save_button" = "保存";
+"visit_details_title" = "就诊详情";
+"add_report_action" = "添加报告";
+"add_recording_action" = "添加录音";
+"recording_title" = "录音";
+"recording_in_progress" = "录音中...";
+"delete_button" = "删除";
+"close_button" = "关闭";
+"select_hospital_title" = "选择医院";
+"search_hospital_placeholder" = "搜索医院";
+"search_nearby_button" = "搜索附近医院";
+"searching_nearby" = "正在搜索附近医院...";
+"nearby_hospitals_title" = "附近的医院";
+"nearby_label" = "附近";
+
+// MARK: - ChronicDiseaseView 慢病管理
+"chronic_disease_title" = "慢病管理";
+"add_health_data_action" = "添加健康数据";
+"add_medication_reminder_action" = "添加药物提醒";
+"add_followup_reminder_action" = "添加复查提醒";
+"all_filter" = "全部";
+"medication_filter" = "用药";
+"followup_filter" = "复查";
+"health_data_filter" = "健康数据";
+"select_member_message" = "请先选择家庭成员";
+"select_member_hint" = "在首页选择一个家庭成员后即可开始管理健康数据";
+"medication_reminders_title" = "药物提醒";
+"followup_reminders_title" = "复查提醒";
+"health_data_title" = "健康数据";
+"no_management_data" = "暂无健康管理数据";
+"click_add_hint" = "点击右上角+号开始添加健康数据、药物提醒或复查提醒";
+"medication_info_section" = "药物信息";
+"medication_name_field" = "药物名称";
+"dosage_field" = "剂量（如：1片，10ml）";
+"frequency_field" = "用药频率（如：每日三次）";
+"reminder_time_section" = "提醒时间";
+"reminder_time_field" = "提醒时间";
+"repeat_reminder_toggle" = "重复提醒";
+"repeat_frequency_field" = "重复频率";
+"add_medication_reminder_title" = "添加药物提醒";
+"followup_info_section" = "复查信息";
+"followup_project_field" = "复查项目";
+"hospital_field" = "医院名称";
+"doctor_field" = "医生姓名";
+"notes_field" = "备注";
+"followup_time_section" = "复查时间";
+"followup_time_field" = "复查时间";
+"add_followup_reminder_title" = "添加复查提醒";
+
+// MARK: - PhotoDiagnosisView 图片诊断
+"photo_diagnosis_title" = "图片诊断";
+"ai_photo_diagnosis_title" = "AI图片诊断";
+"upload_image_description" = "上传医学影像或皮肤照片，获得专业的AI分析建议";
+"upload_image_section" = "上传图片";
+"click_upload_hint" = "点击上传图片";
+"support_formats_hint" = "支持X光片、CT、MRI、皮肤照片等";
+"reselect_button" = "重新选择";
+"photo_action" = "拍照";
+"symptom_optional_section" = "症状描述（可选）";
+"describe_symptoms_placeholder" = "描述相关症状...";
+"additional_notes_section" = "附加说明";
+"start_analysis_button" = "开始AI分析";
+"analyzing_progress" = "AI分析中...";
+"error_title" = "错误";
+"diagnosis_result_title" = "诊断结果";
+"ai_analysis_result_title" = "AI分析结果";
+"professional_advice_title" = "专业建议";
+"attention_recommended" = "建议就医";
+"consult_doctor_message" = "建议尽快咨询专业医生获得进一步诊断和治疗";
+"done_button" = "完成";
+
+// MARK: - MedicalNotificationsView 医疗提醒
+"medical_reminders_title" = "医疗提醒";
+"add_reminder_action" = "添加提醒";
+"clear_completed_action" = "清除已完成";
+"today_filter" = "今天";
+"upcoming_filter" = "即将到来";
+"overdue_filter" = "已过期";
+"completed_filter" = "已完成";
+"no_reminders_message" = "暂无提醒";
+"no_reminders_today_message" = "今天没有提醒";
+"no_upcoming_reminders" = "暂无即将到来的提醒";
+"no_overdue_reminders" = "没有过期的提醒";
+"no_completed_reminders" = "暂无已完成的提醒";
+"click_add_reminder_hint" = "点击右上角添加新的医疗提醒";
+"completed_status" = "已完成";
+"overdue_days_format" = "已逾期 %d 天";
+"overdue_hours_format" = "已逾期 %d 小时";
+"medication_label" = "药物: %@";
+"dosage_label" = "剂量: %@";
+"notification_type_section" = "通知类型";
+"type_field" = "类型";
+"basic_info_section" = "基本信息";
+"title_field" = "标题";
+"message_field" = "消息内容";
+"time_settings_section" = "时间设置";
+"priority_section" = "优先级";
+"priority_field" = "优先级";
+"add_reminder_title" = "添加提醒";
+"edit_reminder_title" = "编辑提醒";
+"choose_operation" = "选择操作";
+"edit_action" = "编辑";
+"disable_reminder" = "禁用提醒";
+"enable_reminder" = "启用提醒";
+"delete_action" = "删除";
+
+// MARK: - FamilyManagementView 家人共享
+"family_sharing_title" = "家人共享";
+"invite_family_section" = "邀请家人";
+"generate_code_description" = "生成邀请码，让家人加入您的健康圈，互相查看健康数据";
+"generate_code_button" = "生成邀请码";
+"my_invite_codes_title" = "我的邀请码";
+"valid_until_format" = "有效期至 %@";
+"copied_status" = "已复制";
+"copy_action" = "复制";
+"invite_code_generated_title" = "邀请码已生成";
+"share_code_message" = "将邀请码分享给家人，让他们加入您的健康圈";
+"valid_period_info" = "有效期：7天 • 11位邀请码";
+"copy_invite_code_button" = "复制邀请码";
+"copied_to_clipboard" = "已复制到剪贴板";
+"family_members_title" = "家庭成员";
+"no_members_message" = "还没有家庭成员";
+"joined_on_format" = "加入于 %@";
+"can_view_data" = "可查看健康数据";
+"cannot_view_data" = "无法查看健康数据";
+"remove_action" = "移除";
+"confirm_remove_title" = "确认移除";
+"remove_member_format" = "确定要移除\"%@\"吗？移除后将无法互相查看健康数据。";
+"join_with_code_button" = "使用邀请码加入";
+"enter_code_title" = "输入邀请码";
+"enter_code_message" = "输入家人分享给您的11位邀请码";
+"enter_code_placeholder" = "输入邀请码";
+"join_family_button" = "加入家庭";
+"hint_title" = "提示";
+"join_success_format" = "✅ %@\n\n已自动添加对方为家庭成员。\n现在您可以：\n• 在首页选择该成员\n• 为他们记录健康数据\n• 查看为他们记录的数据";
+
+// MARK: - AddHealthDataView 添加健康数据
+"add_health_data_title" = "添加健康数据";
+"data_type_section" = "数据类型";
+"value_section" = "数值";
+"record_time_section" = "记录时间";
+"notes_optional_section" = "备注（可选）";
+"save_data_button" = "保存数据";

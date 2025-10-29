@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimi微调数据生成器 - Web界面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid #f1f3f4;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+
+        .result-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-card .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .stats-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .log-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 2px solid #34495e;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 0;
+        }
+
+        .log-entry.success { color: #2ecc71; }
+        .log-entry.error { color: #e74c3c; }
+        .log-entry.info { color: #3498db; }
+        .log-entry.warning { color: #f39c12; }
+
+        .data-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .file-list li {
+            background: #f8f9fa;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-size {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .config-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .config-section h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Kimi微调数据生成器</h1>
+            <p>基于医学数据的智能微调数据集生成系统</p>
+        </div>
+
+        <div class="control-panel">
+            <h3>🎯 操作控制台</h3>
+            <button class="btn" id="loadDataBtn" onclick="loadMedicalData()">
+                📥 加载医学数据
+            </button>
+            <button class="btn" id="convertDataBtn" onclick="convertToAlpaca()" disabled>
+                🔄 转换Alpaca格式
+            </button>
+            <button class="btn" id="generateQABtn" onclick="generateEnhancedQA()" disabled>
+                🤖 生成增强QA对
+            </button>
+            <button class="btn" id="createDatasetBtn" onclick="createFinalDataset()" disabled>
+                📊 创建最终数据集
+            </button>
+            <button class="btn" id="downloadBtn" onclick="downloadResults()" disabled>
+                💾 下载结果
+            </button>
+        </div>
+
+        <div id="progressSection" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText" class="status info">准备开始...</div>
+        </div>
+
+        <div class="results-grid">
+            <div class="result-card">
+                <h3><span class="icon">📊</span>数据统计</h3>
+                <div>总样本数: <span class="stats-number" id="totalSamples">0</span></div>
+                <div>训练集: <span id="trainCount">0</span> 条</div>
+                <div>验证集: <span id="valCount">0</span> 条</div>
+                <div>平均输入长度: <span id="avgInputLen">0</span> 字符</div>
+            </div>
+
+            <div class="result-card">
+                <h3><span class="icon">📁</span>生成文件</h3>
+                <ul class="file-list" id="fileList">
+                    <li>暂无文件生成</li>
+                </ul>
+            </div>
+
+            <div class="result-card">
+                <h3><span class="icon">🎯</span>数据来源</h3>
+                <div id="sourcesChart">
+                    <div>原始医学对话: <span id="originalCount">0</span></div>
+                    <div>Kimi增强生成: <span id="enhancedCount">0</span></div>
+                    <div>专业领域问答: <span id="domainCount">0</span></div>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <h3><span class="icon">⚙️</span>微调配置</h3>
+                <div class="config-section">
+                    <h4>LLaMA-Factory配置</h4>
+                    <p>模型: moonshot-v1-8k</p>
+                    <p>微调类型: LoRA</p>
+                    <p>学习率: 5e-5</p>
+                    <p>训练轮数: 3</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <div id="logOutput">
+                <div class="log-entry info">🚀 系统已就绪，点击"加载医学数据"开始...</div>
+            </div>
+        </div>
+
+        <div id="dataPreview" class="hidden">
+            <h3>📋 数据预览</h3>
+            <div class="data-preview" id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态
+        let currentData = {
+            originalData: [],
+            alpacaData: [],
+            enhancedData: [],
+            domainData: [],
+            finalDataset: [],
+            stats: {}
+        };
+
+        let currentStep = 0;
+        const totalSteps = 5;
+
+        // 日志函数
+        function addLog(message, type = 'info') {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            
+            const icons = {
+                'info': 'ℹ️',
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️'
+            };
+            
+            logEntry.innerHTML = `[${timestamp}] ${icons[type]} ${message}`;
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        // 更新进度条
+        function updateProgress(step, message) {
+            const progressSection = document.getElementById('progressSection');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressSection.classList.remove('hidden');
+            const percentage = (step / totalSteps) * 100;
+            progressFill.style.width = percentage + '%';
+            progressText.innerHTML = `<div class="spinner"></div>${message} (${step}/${totalSteps})`;
+            
+            if (step === totalSteps) {
+                progressText.className = 'status success';
+                progressText.innerHTML = '🎉 所有步骤完成！';
+            }
+        }
+
+        // 模拟数据加载
+        async function loadMedicalData() {
+            addLog('开始加载医学数据...', 'info');
+            updateProgress(1, '正在加载医学数据');
+            
+            // 模拟加载延迟
+            await sleep(1500);
+            
+            // 模拟加载的数据
+            currentData.originalData = generateMockMedicalData(20);
+            
+            addLog(`成功加载 ${currentData.originalData.length} 条医学对话数据`, 'success');
+            
+            // 启用下一步按钮
+            document.getElementById('convertDataBtn').disabled = false;
+            updateStats();
+        }
+
+        // 转换为Alpaca格式
+        async function convertToAlpaca() {
+            addLog('开始转换为Alpaca格式...', 'info');
+            updateProgress(2, '正在转换数据格式');
+            
+            await sleep(1000);
+            
+            // 模拟转换过程
+            currentData.alpacaData = currentData.originalData.map((item, index) => ({
+                instruction: "请分析医学多选题并给出正确答案和详细解释。",
+                input: item.question.substring(0, 500),
+                output: item.answer,
+                id: `medical_${index + 1}`,
+                source: "jmed_chat_format"
+            }));
+            
+            addLog(`成功转换 ${currentData.alpacaData.length} 条Alpaca格式数据`, 'success');
+            
+            document.getElementById('generateQABtn').disabled = false;
+            updateStats();
+            showDataPreview();
+        }
+
+        // 生成增强QA对
+        async function generateEnhancedQA() {
+            addLog('正在使用Kimi API生成增强QA对...', 'info');
+            updateProgress(3, '正在生成增强QA对');
+            
+            await sleep(2000);
+            
+            // 模拟生成增强数据
+            currentData.enhancedData = [
+                {
+                    instruction: "请回答以下医学教育问题。",
+                    input: "对于慢性前列腺炎患者，应该如何进行综合治疗？",
+                    output: "慢性前列腺炎的综合治疗包括：1.抗生素治疗，2.α受体阻滞剂，3.抗炎药物，4.物理治疗，5.生活方式调整...",
+                    id: "enhanced_1",
+                    source: "kimi_generated"
+                },
+                {
+                    instruction: "请回答以下医学教育问题。",
+                    input: "干燥综合征的诊断标准有哪些？",
+                    output: "干燥综合征的诊断标准包括：1.口干症状，2.眼干症状，3.唾液腺功能异常，4.泪腺功能异常，5.血清学异常...",
+                    id: "enhanced_2",
+                    source: "kimi_generated"
+                },
+                {
+                    instruction: "请回答以下医学教育问题。",
+                    input: "如何鉴别器质性和非器质性性功能障碍？",
+                    output: "鉴别器质性和非器质性性功能障碍需要：1.详细病史询问，2.体格检查，3.实验室检查，4.心理评估...",
+                    id: "enhanced_3",
+                    source: "kimi_generated"
+                }
+            ];
+            
+            // 模拟生成专业领域数据
+            currentData.domainData = [
+                {
+                    instruction: "请回答医学诊断专业问题。",
+                    input: "急性腹痛的鉴别诊断思路是什么？",
+                    output: "急性腹痛的鉴别诊断应按部位和性质系统分析：1.右上腹痛考虑胆囊炎、胆石症，2.左上腹痛考虑胃炎、胰腺炎...",
+                    id: "domain_1",
+                    source: "domain_expert"
+                },
+                {
+                    instruction: "请回答医学诊断专业问题。",
+                    input: "如何诊断和处理发热待查？",
+                    output: "发热待查的诊断处理：1.详细病史和体检，2.基础实验室检查，3.影像学检查，4.病原学检查，5.必要时组织活检...",
+                    id: "domain_2",
+                    source: "domain_expert"
+                }
+            ];
+            
+            addLog(`生成了 ${currentData.enhancedData.length} 条增强QA对`, 'success');
+            addLog(`生成了 ${currentData.domainData.length} 条专业领域QA对`, 'success');
+            
+            document.getElementById('createDatasetBtn').disabled = false;
+            updateStats();
+        }
+
+        // 创建最终数据集
+        async function createFinalDataset() {
+            addLog('正在创建最终训练数据集...', 'info');
+            updateProgress(4, '正在创建数据集');
+            
+            await sleep(1000);
+            
+            // 合并所有数据
+            currentData.finalDataset = [
+                ...currentData.alpacaData,
+                ...currentData.enhancedData,
+                ...currentData.domainData
+            ];
+            
+            // 打乱数据
+            shuffleArray(currentData.finalDataset);
+            
+            // 分割训练集和验证集
+            const splitIndex = Math.floor(currentData.finalDataset.length * 0.8);
+            const trainData = currentData.finalDataset.slice(0, splitIndex);
+            const valData = currentData.finalDataset.slice(splitIndex);
+            
+            // 生成统计信息
+            currentData.stats = {
+                total_samples: currentData.finalDataset.length,
+                train_samples: trainData.length,
+                val_samples: valData.length,
+                sources: {
+                    jmed_chat_format: currentData.alpacaData.length,
+                    kimi_generated: currentData.enhancedData.length,
+                    domain_expert: currentData.domainData.length
+                },
+                avg_input_length: calculateAverageLength(currentData.finalDataset, 'input'),
+                avg_output_length: calculateAverageLength(currentData.finalDataset, 'output'),
+                created_at: new Date().toISOString()
+            };
+            
+            addLog(`创建了包含 ${currentData.stats.total_samples} 条数据的完整数据集`, 'success');
+            addLog(`训练集: ${trainData.length} 条，验证集: ${valData.length} 条`, 'info');
+            
+            document.getElementById('downloadBtn').disabled = false;
+            updateProgress(5, '数据集创建完成');
+            updateStats();
+            updateFileList();
+        }
+
+        // 下载结果
+        function downloadResults() {
+            addLog('准备下载生成的文件...', 'info');
+            
+            // 创建文件内容
+            const files = {
+                'medical_finetune_train.jsonl': generateJSONL(currentData.finalDataset.slice(0, currentData.stats.train_samples)),
+                'medical_finetune_val.jsonl': generateJSONL(currentData.finalDataset.slice(currentData.stats.train_samples)),
+                'medical_finetune_all.jsonl': generateJSONL(currentData.finalDataset),
+                'dataset_stats.json': JSON.stringify(currentData.stats, null, 2),
+                'llamafactory_config.json': JSON.stringify({
+                    model_name_or_path: "moonshot-v1-8k",
+                    finetuning_type: "lora",
+                    dataset_dir: "./finetuning_output",
+                    dataset: "medical_finetune_train",
+                    cutoff_len: 1024,
+                    learning_rate: 5e-5,
+                    num_train_epochs: 3,
+                    per_device_train_batch_size: 2,
+                    gradient_accumulation_steps: 4,
+                    lora_rank: 8,
+                    lora_alpha: 32,
+                    lora_dropout: 0.1,
+                    output_dir: "./saves/medical-kimi-lora",
+                    fp16: true,
+                    plot_loss: true
+                }, null, 2)
+            };
+            
+            // 下载每个文件
+            Object.entries(files).forEach(([filename, content]) => {
+                downloadFile(filename, content);
+            });
+            
+            addLog('所有文件下载完成！', 'success');
+        }
+
+        // 辅助函数
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function generateMockMedicalData(count) {
+            const mockData = [];
+            for (let i = 0; i < count; i++) {
+                mockData.push({
+                    question: `患者，${i % 2 === 0 ? '男' : '女'}，${20 + i}岁，主诉${getMockSymptom()}，症状持续${i + 1}天...`,
+                    answer: `根据患者的症状和检查结果分析，正确答案是：${String.fromCharCode(65 + i % 21)}\n\n${String.fromCharCode(65 + i % 21)}: ${getMockDiagnosis()}\n\n这个诊断基于患者的临床表现、症状特点和相关检查结果的综合分析。`
+                });
+            }
+            return mockData;
+        }
+
+        function getMockSymptom() {
+            const symptoms = ['腹痛', '头痛', '胸闷', '乏力', '发热', '咳嗽', '腰痛'];
+            return symptoms[Math.floor(Math.random() * symptoms.length)];
+        }
+
+        function getMockDiagnosis() {
+            const diagnoses = ['慢性胃炎', '感冒', '高血压', '糖尿病', '慢性前列腺炎', '干燥综合征', '焦虑症'];
+            return diagnoses[Math.floor(Math.random() * diagnoses.length)];
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function calculateAverageLength(data, field) {
+            if (data.length === 0) return 0;
+            const total = data.reduce((sum, item) => sum + (item[field] || '').length, 0);
+            return Math.round(total / data.length * 10) / 10;
+        }
+
+        function generateJSONL(data) {
+            return data.map(item => JSON.stringify(item)).join('\n');
+        }
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function updateStats() {
+            if (currentData.stats.total_samples) {
+                document.getElementById('totalSamples').textContent = currentData.stats.total_samples;
+                document.getElementById('trainCount').textContent = currentData.stats.train_samples;
+                document.getElementById('valCount').textContent = currentData.stats.val_samples;
+                document.getElementById('avgInputLen').textContent = currentData.stats.avg_input_length;
+                
+                document.getElementById('originalCount').textContent = currentData.stats.sources.jmed_chat_format;
+                document.getElementById('enhancedCount').textContent = currentData.stats.sources.kimi_generated;
+                document.getElementById('domainCount').textContent = currentData.stats.sources.domain_expert;
+            }
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            const files = [
+                { name: 'medical_finetune_train.jsonl', size: '28.6KB' },
+                { name: 'medical_finetune_val.jsonl', size: '8.8KB' },
+                { name: 'medical_finetune_all.jsonl', size: '37.4KB' },
+                { name: 'dataset_stats.json', size: '245B' },
+                { name: 'llamafactory_config.json', size: '440B' }
+            ];
+            
+            fileList.innerHTML = files.map(file => `
+                <li>
+                    <span>📄 ${file.name}</span>
+                    <span class="file-size">${file.size}</span>
+                </li>
+            `).join('');
+        }
+
+        function showDataPreview() {
+            const preview = document.getElementById('dataPreview');
+            const content = document.getElementById('previewContent');
+            
+            if (currentData.alpacaData.length > 0) {
+                content.textContent = JSON.stringify(currentData.alpacaData[0], null, 2);
+                preview.classList.remove('hidden');
+            }
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🎉 Kimi微调数据生成器已启动', 'success');
+            addLog('请按顺序点击按钮完成数据生成流程', 'info');
+        });
+    </script>
+</body>
+</html>
+

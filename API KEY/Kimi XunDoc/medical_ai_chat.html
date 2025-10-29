@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业医学AI问答系统 - 基于微调Kimi模型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .model-status {
+            display: inline-block;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #856404;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .disclaimer strong {
+            color: #d63384;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .specialty-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .specialty-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .specialty-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 15px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .specialty-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .specialty-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .chat-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .message.user {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .message.assistant {
+            background: #e9ecef;
+            color: #2c3e50;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.system {
+            background: #d1ecf1;
+            color: #0c5460;
+            text-align: center;
+            font-size: 14px;
+            max-width: 100%;
+            border-radius: 25px;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            max-width: 100%;
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .question-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 50px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .question-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            min-width: 80px;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .control-btn.danger {
+            background: #dc3545;
+        }
+
+        .control-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .status-info {
+            font-size: 14px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .quick-questions {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-questions h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .quick-question-btn {
+            display: inline-block;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .quick-question-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .specialty-panel {
+                order: -1;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .chat-area {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 专业医学AI问答系统</h1>
+            <div class="subtitle">基于微调Kimi模型的智能医疗咨询助手</div>
+            <div class="model-status">
+                🤖 模型状态: kimi-k2-0905-preview (微调版本)
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>⚠️ 重要医疗声明</strong><br>
+            本系统基于AI技术提供医学信息参考，<strong>不能替代专业医生的诊断和治疗</strong>。<br>
+            • 遇到紧急情况请立即拨打120或前往医院急诊科<br>
+            • 用药请严格遵医嘱，不要根据AI建议自行调整药物<br>
+            • 本系统建议仅供学习和初步了解，最终诊疗请咨询专业医生
+        </div>
+
+        <div class="main-content">
+            <div class="specialty-panel">
+                <h3>🏥 专科选择</h3>
+                <button class="specialty-btn active" data-specialty="general" onclick="selectSpecialty('general', this)">
+                    🩺 全科医学
+                </button>
+                <button class="specialty-btn" data-specialty="cardiology" onclick="selectSpecialty('cardiology', this)">
+                    ❤️ 心血管内科
+                </button>
+                <button class="specialty-btn" data-specialty="neurology" onclick="selectSpecialty('neurology', this)">
+                    🧠 神经内科
+                </button>
+                <button class="specialty-btn" data-specialty="gastroenterology" onclick="selectSpecialty('gastroenterology', this)">
+                    🫄 消化内科
+                </button>
+                <button class="specialty-btn" data-specialty="respiratory" onclick="selectSpecialty('respiratory', this)">
+                    🫁 呼吸内科
+                </button>
+                <button class="specialty-btn" data-specialty="endocrinology" onclick="selectSpecialty('endocrinology', this)">
+                    ⚕️ 内分泌科
+                </button>
+                <button class="specialty-btn" data-specialty="urology" onclick="selectSpecialty('urology', this)">
+                    🫘 泌尿科
+                </button>
+                <button class="specialty-btn" data-specialty="gynecology" onclick="selectSpecialty('gynecology', this)">
+                    👩‍⚕️ 妇科
+                </button>
+                <button class="specialty-btn" data-specialty="pediatrics" onclick="selectSpecialty('pediatrics', this)">
+                    👶 儿科
+                </button>
+            </div>
+
+            <div class="chat-area">
+                <div class="messages" id="messages">
+                    <div class="message system">
+                        🤖 您好！我是专业的医学AI助手，经过大量医学数据微调训练。<br>
+                        请选择相应的专科，然后描述您的症状或医学问题，我会为您提供专业的医学建议和分析。
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    🤖 AI正在分析您的问题，请稍候
+                </div>
+                
+                <div class="input-area">
+                    <textarea class="question-input" 
+                              id="questionInput" 
+                              placeholder="请详细描述您的症状、病史或医学问题..."
+                              onkeypress="handleKeyPress(event)"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="askQuestion()">
+                        发送
+                    </button>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-buttons">
+                        <button class="control-btn danger" onclick="clearHistory()">
+                            🗑️ 清除对话
+                        </button>
+                        <button class="control-btn" onclick="exportChat()">
+                            📄 导出对话
+                        </button>
+                    </div>
+                    <div class="status-info">
+                        <div class="status-indicator"></div>
+                        <span>专科: <span id="currentSpecialty">全科医学</span></span>
+                        <span>|</span>
+                        <span>会话: <span id="sessionId">session_001</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-questions">
+            <h4>💡 常见问题快速咨询</h4>
+            <span class="quick-question-btn" onclick="askQuickQuestion('头痛持续3天，伴有恶心，可能是什么原因？')">头痛伴恶心</span>
+            <span class="quick-question-btn" onclick="askQuickQuestion('胸闷气短，心跳加快，需要注意什么？')">胸闷气短</span>
+            <span class="quick-question-btn" onclick="askQuickQuestion('腹痛腹泻，持续2天，如何处理？')">腹痛腹泻</span>
+            <span class="quick-question-btn" onclick="askQuickQuestion('血压偏高，平时如何预防和调理？')">高血压调理</span>
+            <span class="quick-question-btn" onclick="askQuickQuestion('糖尿病患者饮食有什么注意事项？')">糖尿病饮食</span>
+            <span class="quick-question-btn" onclick="askQuickQuestion('失眠多梦，如何改善睡眠质量？')">失眠问题</span>
+        </div>
+    </div>
+
+    <script>
+        // 配置信息
+        const API_KEY = "sk-wc9tcOA0q2ShfOjKZ91YStbbyyoMGpiegf6zq54i9kpaQtke";
+        const BASE_URL = "https://api.moonshot.cn/v1";
+        const MODEL_NAME = "kimi-k2-0905-preview";
+
+        // 全局变量
+        let currentSpecialty = 'general';
+        let sessionId = 'session_' + Date.now();
+        let conversationHistory = [];
+        let isLoading = false;
+
+        // 专科配置
+        const specialtyConfig = {
+            'general': {
+                name: '全科医学',
+                prompt: '你是一位经验丰富的全科医生，能够处理各种常见疾病和健康问题。'
+            },
+            'cardiology': {
+                name: '心血管内科',
+                prompt: '你是一位心血管内科专家，专门处理心脏病、高血压、心律失常等心血管疾病。'
+            },
+            'neurology': {
+                name: '神经内科',
+                prompt: '你是一位神经内科专家，专门处理头痛、癫痫、帕金森病、脑卒中等神经系统疾病。'
+            },
+            'gastroenterology': {
+                name: '消化内科',
+                prompt: '你是一位消化内科专家，专门处理胃炎、肠炎、肝病、胆囊疾病等消化系统疾病。'
+            },
+            'respiratory': {
+                name: '呼吸内科',
+                prompt: '你是一位呼吸内科专家，专门处理哮喘、肺炎、慢阻肺、肺癌等呼吸系统疾病。'
+            },
+            'endocrinology': {
+                name: '内分泌科',
+                prompt: '你是一位内分泌科专家，专门处理糖尿病、甲状腺疾病、肾上腺疾病等内分泌系统疾病。'
+            },
+            'urology': {
+                name: '泌尿科',
+                prompt: '你是一位泌尿科专家，专门处理前列腺疾病、肾结石、泌尿系感染等泌尿系统疾病。'
+            },
+            'gynecology': {
+                name: '妇科',
+                prompt: '你是一位妇科专家，专门处理月经不调、妇科炎症、子宫肌瘤等妇科疾病。'
+            },
+            'pediatrics': {
+                name: '儿科',
+                prompt: '你是一位儿科专家，专门处理儿童常见病、疫苗接种、生长发育等儿童健康问题。'
+            }
+        };
+
+        // 系统提示词
+        const getSystemPrompt = (specialty) => {
+            const config = specialtyConfig[specialty] || specialtyConfig['general'];
+            return `${config.prompt}
+
+你具备以下专业能力：
+1. 基于症状进行初步诊断分析（仅供参考）
+2. 提供基于循证医学的治疗建议
+3. 解答药物使用、副作用等问题
+4. 提供疾病预防和健康教育指导
+
+重要提醒：
+- 你的建议仅供医学参考，不能替代专业医生的诊断治疗
+- 遇到紧急情况，建议患者立即就医
+- 用药建议需要在医生指导下进行
+
+请用专业但易懂的语言回答患者问题，并在必要时建议就医。`;
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('questionInput').focus();
+            document.getElementById('sessionId').textContent = sessionId.substring(0, 12) + '...';
+        });
+
+        // 选择专科
+        function selectSpecialty(specialty, button) {
+            // 移除所有按钮的active类
+            document.querySelectorAll('.specialty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加当前按钮的active类
+            button.classList.add('active');
+            
+            // 更新当前专科
+            currentSpecialty = specialty;
+            const specialtyName = specialtyConfig[specialty].name;
+            document.getElementById('currentSpecialty').textContent = specialtyName;
+            
+            // 添加系统消息
+            addMessage('system', `已切换到 ${specialtyName} 专科模式，我将为您提供更专业的${specialtyName}咨询服务。`);
+        }
+
+        // 处理键盘事件
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                askQuestion();
+            }
+        }
+
+        // 快速提问
+        function askQuickQuestion(question) {
+            document.getElementById('questionInput').value = question;
+            askQuestion();
+        }
+
+        // 询问问题
+        async function askQuestion() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            
+            if (!question || isLoading) {
+                return;
+            }
+            
+            // 显示用户问题
+            addMessage('user', question);
+            input.value = '';
+            
+            // 设置加载状态
+            setLoading(true);
+            
+            try {
+                // 构建消息历史
+                const messages = [
+                    {
+                        role: "system",
+                        content: getSystemPrompt(currentSpecialty)
+                    }
+                ];
+
+                // 添加最近的对话历史（保留最近6条）
+                const recentHistory = conversationHistory.slice(-6);
+                messages.push(...recentHistory);
+
+                // 添加当前问题
+                messages.push({
+                    role: "user",
+                    content: question
+                });
+
+                // 调用Kimi API
+                const response = await fetch(`${BASE_URL}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: MODEL_NAME,
+                        messages: messages,
+                        temperature: 0.3,
+                        max_tokens: 2000,
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // 显示AI回答
+                addMessage('assistant', aiResponse);
+
+                // 保存对话历史
+                conversationHistory.push(
+                    { role: "user", content: question },
+                    { role: "assistant", content: aiResponse }
+                );
+
+                // 限制历史长度
+                if (conversationHistory.length > 20) {
+                    conversationHistory = conversationHistory.slice(-20);
+                }
+
+            } catch (error) {
+                console.error('API调用失败:', error);
+                addMessage('error', `❌ 抱歉，系统暂时无法回答您的问题。\n错误信息: ${error.message}\n\n请稍后重试或检查网络连接。`);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // 添加消息
+        function addMessage(type, content) {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            
+            // 处理换行和格式化
+            const formattedContent = content
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            message.innerHTML = formattedContent;
+            
+            // 添加时间戳
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString();
+            message.appendChild(timeDiv);
+            
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // 设置加载状态
+        function setLoading(loading) {
+            isLoading = loading;
+            const loadingDiv = document.getElementById('loading');
+            const sendBtn = document.getElementById('sendBtn');
+            const input = document.getElementById('questionInput');
+            
+            if (loading) {
+                loadingDiv.classList.add('show');
+                sendBtn.disabled = true;
+                sendBtn.textContent = '思考中...';
+                input.disabled = true;
+            } else {
+                loadingDiv.classList.remove('show');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        // 清除对话历史
+        function clearHistory() {
+            if (!confirm('确定要清除所有对话记录吗？')) {
+                return;
+            }
+            
+            // 清空消息区域
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `
+                <div class="message system">
+                    🤖 对话已清除。我是专业的医学AI助手，请选择专科并描述您的症状或医学问题。
+                </div>
+            `;
+            
+            // 清空对话历史
+            conversationHistory = [];
+            
+            // 生成新的会话ID
+            sessionId = 'session_' + Date.now();
+            document.getElementById('sessionId').textContent = sessionId.substring(0, 12) + '...';
+        }
+
+        // 导出对话
+        function exportChat() {
+            const messages = document.querySelectorAll('.message');
+            let chatText = `医学AI问答对话记录\n生成时间: ${new Date().toLocaleString()}\n专科: ${specialtyConfig[currentSpecialty].name}\n会话ID: ${sessionId}\n\n`;
+            
+            messages.forEach((msg, index) => {
+                const type = msg.classList.contains('user') ? '用户' : 
+                           msg.classList.contains('assistant') ? 'AI医生' : '系统';
+                const content = msg.textContent.replace(/\d{2}:\d{2}:\d{2}$/, '').trim();
+                chatText += `${type}: ${content}\n\n`;
+            });
+            
+            // 创建下载链接
+            const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `医学AI对话记录_${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            addMessage('system', '📄 对话记录已导出下载');
+        }
+    </script>
+</body>
+</html>
