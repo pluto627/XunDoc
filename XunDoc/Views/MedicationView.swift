@@ -106,13 +106,13 @@ struct MedicationView: View {
 struct MedicationHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("用药管理")
+            Text(NSLocalizedString("medication_management", comment: ""))
                 .font(.appTitle())
                 .foregroundColor(.textPrimary)
             
             HStack(spacing: 8) {
                 PulsingDot(color: .accentPrimary)
-                Text("智能用药提醒")
+                Text(NSLocalizedString("smart_medication_reminder", comment: ""))
                     .font(.appCaption())
                     .foregroundColor(.textSecondary)
             }
@@ -128,7 +128,7 @@ struct MyMedicationsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("我的药物")
+            Text(NSLocalizedString("my_medications", comment: ""))
                 .font(.appLabel())
                 .foregroundColor(.textSecondary)
                 .textCase(.uppercase)
@@ -147,11 +147,11 @@ struct MyMedicationsSection: View {
                     }
                     
                     VStack(spacing: 6) {
-                        Text("暂无用药记录")
+                        Text(NSLocalizedString("no_medications_yet", comment: ""))
                             .font(.appSubheadline())
                             .foregroundColor(.textSecondary)
                         
-                        Text("添加您的第一个药品提醒")
+                        Text(NSLocalizedString("add_first_medication", comment: ""))
                             .font(.appSmall())
                             .foregroundColor(.textTertiary)
                     }
@@ -232,12 +232,12 @@ struct AddMedicationSection: View {
                     .font(.system(size: 24))
                     .foregroundColor(.textSecondary)
                 
-                Text("添加新药物")
-                    .font(.system(size: 14, weight: .medium))
+                Text(NSLocalizedString("add_new_medication", comment: ""))
+                    .font(.appCaption())
                     .foregroundColor(.textSecondary)
                 
-                Text("可拍照识别药品信息")
-                    .font(.system(size: 11))
+                Text(NSLocalizedString("quick_add_medication", comment: ""))
+                    .font(.appSmall())
                     .foregroundColor(.textSecondary)
             }
             .frame(maxWidth: .infinity)
@@ -267,15 +267,15 @@ struct StatisticsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("本周统计")
-                .font(.system(size: 14, weight: .semibold))
+            Text(NSLocalizedString("weekly_statistics", comment: ""))
+                .font(.appCaption())
                 .foregroundColor(.textSecondary)
                 .textCase(.uppercase)
                 .tracking(0.05)
             
             HStack(spacing: 20) {
-                StatItem(value: totalMedications, label: "当前药物")
-                StatItem(value: activeDoses, label: "每日服药次数")
+                StatItem(value: totalMedications, label: NSLocalizedString("current_medications", comment: ""))
+                StatItem(value: activeDoses, label: NSLocalizedString("daily_doses", comment: ""))
             }
         }
         .padding(24)
@@ -295,11 +295,11 @@ struct StatItem: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.system(size: 28, weight: .semibold))
+                .font(.appLargeNumber())
                 .foregroundColor(.textPrimary)
             
             Text(label)
-                .font(.system(size: 12))
+                .font(.appSmall())
                 .foregroundColor(.textSecondary)
         }
         .frame(maxWidth: .infinity)
@@ -314,6 +314,7 @@ struct MedicationDetailPopup: View {
     @State private var showingInventory = false
     @State private var inventory: Int = 100
     @State private var showingDeleteAlert = false
+    @State private var showingEditForm = false
     
     // 获取药物类型（从notes中提取）
     private var medicationType: String {
@@ -356,7 +357,7 @@ struct MedicationDetailPopup: View {
                     Spacer()
                     
                     Button(action: {
-                        // TODO: 编辑功能
+                        showingEditForm = true
                     }) {
                         Text("编辑")
                             .font(.appSubheadline())
@@ -379,7 +380,7 @@ struct MedicationDetailPopup: View {
                         }) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("剩余数量")
+                                    Text(NSLocalizedString("remaining_quantity", comment: ""))
                                         .font(.appCaption())
                                         .foregroundColor(.textSecondary)
                                     
@@ -415,6 +416,10 @@ struct MedicationDetailPopup: View {
         }
         .sheet(isPresented: $showingInventory) {
             inventorySheet
+        }
+        .sheet(isPresented: $showingEditForm) {
+            EditMedicationFormView(medication: medication, isPresented: $showingEditForm)
+                .environmentObject(healthDataManager)
         }
         .onAppear {
             loadMedicationData()
@@ -457,27 +462,27 @@ struct MedicationDetailPopup: View {
                 GridItem(.flexible(), spacing: 12)
             ], spacing: 12) {
                 // 规格/剂量
-                detailCard(icon: "pills.circle.fill", label: "规格/剂量", value: medication.dosage)
+                detailCard(icon: "pills.circle.fill", label: NSLocalizedString("medication_spec", comment: ""), value: medication.dosage)
                 
                 // 服用频率
-                detailCard(icon: "clock.fill", label: "服用频率", value: frequencyText)
+                detailCard(icon: "clock.fill", label: NSLocalizedString("medication_frequency", comment: ""), value: frequencyText)
                 
                 // 服用时间
                 if !medication.reminderTimes.isEmpty {
-                    detailCard(icon: "alarm.fill", label: "服用时间", value: reminderTimesText)
+                    detailCard(icon: "alarm.fill", label: NSLocalizedString("medication_time", comment: ""), value: reminderTimesText)
                 }
                 
                 // 剂型
-                detailCard(icon: "capsule.fill", label: "剂型", value: medicationType)
+                detailCard(icon: "capsule.fill", label: NSLocalizedString("medication_form", comment: ""), value: medicationType)
                 
                 // 药物用途（跨两列）
                 if let usage = medication.usage {
-                    detailCard(icon: "heart.text.square.fill", label: "药物用途", value: usage, isWide: true)
+                    detailCard(icon: "heart.text.square.fill", label: NSLocalizedString("medication_usage", comment: ""), value: usage, isWide: true)
                 }
                 
                 // 服用说明（跨两列）
                 if let instructions = medication.instructions {
-                    detailCard(icon: "doc.text.fill", label: "服用说明", value: instructions, isWide: true)
+                    detailCard(icon: "doc.text.fill", label: NSLocalizedString("medication_instructions", comment: ""), value: instructions, isWide: true)
                 }
             }
         }
@@ -626,6 +631,283 @@ extension View {
         } else {
             self
         }
+    }
+}
+
+// MARK: - Edit Medication Form View
+struct EditMedicationFormView: View {
+    let medication: MedicationReminder
+    @Binding var isPresented: Bool
+    @EnvironmentObject var healthDataManager: HealthDataManager
+    
+    @State private var medicationName: String = ""
+    @State private var dosage: String = ""
+    @State private var frequency: MedicationReminder.Frequency = .onceDaily
+    @State private var reminderTimes: [Date] = []
+    @State private var usage: String = ""
+    @State private var instructions: String = ""
+    @State private var notes: String = ""
+    @State private var showingDeleteAlert = false
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.appBackgroundColor.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        medicationNameSection
+                        dosageSection
+                        frequencySection
+                        reminderTimesSection
+                        usageSection
+                        instructionsSection
+                        notesSection
+                        saveButton
+                        deleteButton
+                    }
+                    .padding(20)
+                }
+            }
+            .navigationTitle(NSLocalizedString("edit_medication", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(NSLocalizedString("cancel", comment: "")) {
+                        isPresented = false
+                    }
+                    .foregroundColor(.textSecondary)
+                }
+            }
+        }
+        .alert(NSLocalizedString("confirm_delete", comment: ""), isPresented: $showingDeleteAlert) {
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) { }
+            Button(NSLocalizedString("delete", comment: ""), role: .destructive) {
+                deleteMedication()
+            }
+        } message: {
+            Text(String(format: NSLocalizedString("confirm_delete_medication_format", comment: ""), medicationName))
+        }
+        .onAppear {
+            loadMedicationData()
+        }
+    }
+    
+    // MARK: - View Components
+    
+    private var medicationNameSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("medication_name", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            TextField(NSLocalizedString("medication_name_placeholder", comment: ""), text: $medicationName)
+                .font(.appBody())
+                .foregroundColor(.textPrimary)
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+        }
+    }
+    
+    private var dosageSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("dosage", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            TextField(NSLocalizedString("dosage_placeholder", comment: ""), text: $dosage)
+                .font(.appBody())
+                .foregroundColor(.textPrimary)
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+        }
+    }
+    
+    private var frequencySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("frequency", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            Picker(NSLocalizedString("frequency", comment: ""), selection: $frequency) {
+                Text(NSLocalizedString("frequency_once_daily", comment: "")).tag(MedicationReminder.Frequency.onceDaily)
+                Text(NSLocalizedString("frequency_twice_daily", comment: "")).tag(MedicationReminder.Frequency.twiceDaily)
+                Text(NSLocalizedString("frequency_three_times_daily", comment: "")).tag(MedicationReminder.Frequency.threeTimesDaily)
+                Text(NSLocalizedString("frequency_four_times_daily", comment: "")).tag(MedicationReminder.Frequency.fourTimesDaily)
+                Text(NSLocalizedString("frequency_as_needed", comment: "")).tag(MedicationReminder.Frequency.asNeeded)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+        }
+    }
+    
+    private var reminderTimesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(NSLocalizedString("reminder_times", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            ForEach(Array(reminderTimes.enumerated()), id: \.offset) { index, time in
+                HStack {
+                    DatePicker("", selection: Binding(
+                        get: { reminderTimes[index] },
+                        set: { reminderTimes[index] = $0 }
+                    ), displayedComponents: .hourAndMinute)
+                    .font(.appBody())
+                    .foregroundColor(.textPrimary)
+                    
+                    Button(action: {
+                        reminderTimes.remove(at: index)
+                    }) {
+                        Image(systemName: "minus.circle.fill")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+            }
+            
+            Button(action: {
+                reminderTimes.append(Date())
+            }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text(NSLocalizedString("add_reminder_time", comment: ""))
+                }
+                .font(.appBody())
+                .foregroundColor(.accentPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+            }
+        }
+    }
+    
+    private var usageSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("usage_condition", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            TextField(NSLocalizedString("enter_condition", comment: ""), text: $usage)
+                .font(.appBody())
+                .foregroundColor(.textPrimary)
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+        }
+    }
+    
+    private var instructionsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("medication_guidance_hint", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            TextField(NSLocalizedString("add_notes", comment: ""), text: $instructions)
+                .font(.appBody())
+                .foregroundColor(.textPrimary)
+                .padding(16)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+        }
+    }
+    
+    private var notesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(NSLocalizedString("notes_label", comment: ""))
+                .font(.appLabel())
+                .foregroundColor(.textSecondary)
+            
+            TextEditor(text: $notes)
+                .font(.appBody())
+                .foregroundColor(.textPrimary)
+                .frame(height: 100)
+                .padding(12)
+                .background(Color.secondaryBackgroundColor)
+                .cornerRadius(12)
+        }
+    }
+    
+    private var saveButton: some View {
+        Button(action: saveMedication) {
+            Text(NSLocalizedString("save", comment: ""))
+                .font(.appSubheadline())
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.accentPrimary)
+                .cornerRadius(16)
+        }
+        .padding(.top, 8)
+    }
+    
+    private var deleteButton: some View {
+        Button(action: {
+            showingDeleteAlert = true
+        }) {
+            HStack {
+                Image(systemName: "trash")
+                Text(NSLocalizedString("delete", comment: ""))
+            }
+            .font(.appSubheadline())
+            .foregroundColor(.red)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(Color.red.opacity(0.1))
+            .cornerRadius(16)
+        }
+        .padding(.top, 4)
+    }
+    
+    // MARK: - Data Management
+    
+    private func loadMedicationData() {
+        medicationName = medication.medicationName
+        dosage = medication.dosage
+        frequency = medication.frequency
+        reminderTimes = medication.reminderTimes
+        usage = medication.usage ?? ""
+        instructions = medication.instructions ?? ""
+        notes = medication.notes ?? ""
+    }
+    
+    private func saveMedication() {
+        // 验证输入
+        guard !medicationName.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        
+        guard !dosage.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        
+        // 查找并更新药物
+        if let index = healthDataManager.medicationReminders.firstIndex(where: { $0.id == medication.id }) {
+            // 创建更新后的药物对象
+            healthDataManager.medicationReminders[index].medicationName = medicationName
+            healthDataManager.medicationReminders[index].dosage = dosage
+            healthDataManager.medicationReminders[index].frequency = frequency
+            healthDataManager.medicationReminders[index].reminderTimes = reminderTimes
+            healthDataManager.medicationReminders[index].usage = usage.isEmpty ? nil : usage
+            healthDataManager.medicationReminders[index].instructions = instructions.isEmpty ? nil : instructions
+            healthDataManager.medicationReminders[index].notes = notes.isEmpty ? nil : notes
+            
+            healthDataManager.saveData()
+        }
+        
+        isPresented = false
+    }
+    
+    private func deleteMedication() {
+        if let index = healthDataManager.medicationReminders.firstIndex(where: { $0.id == medication.id }) {
+            healthDataManager.medicationReminders.remove(at: index)
+            healthDataManager.saveData()
+        }
+        isPresented = false
     }
 }
 

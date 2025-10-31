@@ -79,12 +79,12 @@ struct AddMedicationFormView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
                             // 基本信息
-                            sectionHeader(title: "基本信息")
+                            sectionHeader(title: NSLocalizedString("medication_basic_info", comment: ""))
                             
                             VStack(spacing: 0) {
                                 // 名称
-                                formRow(title: "名称") {
-                                    TextField("请输入", text: $medicationName)
+                                formRow(title: NSLocalizedString("medication_name_label", comment: "")) {
+                                    TextField(NSLocalizedString("name_placeholder", comment: ""), text: $medicationName)
                                         .multilineTextAlignment(.trailing)
                                         .foregroundColor(.textSecondary)
                                         .focused($focusedField, equals: .name)
@@ -98,7 +98,7 @@ struct AddMedicationFormView: View {
                                     .padding(.leading, 60)
                                 
                                 // 类型
-                                formRow(title: "类型") {
+                                formRow(title: NSLocalizedString("medication_type_label", comment: "")) {
                                     Menu {
                                         ForEach(medicationTypes, id: \.self) { type in
                                             Button(action: {
@@ -129,12 +129,12 @@ struct AddMedicationFormView: View {
                             .padding(.bottom, 16)
                         
                             // 剂量信息
-                            sectionHeader(title: "剂量信息")
+                            sectionHeader(title: NSLocalizedString("dosage_info", comment: ""))
                             
                             VStack(spacing: 0) {
                                 // 用药剂量
-                                formRow(title: "用药剂量") {
-                                    TextField("请输入", text: $dosageAmount)
+                                formRow(title: NSLocalizedString("dosage_amount_label", comment: "")) {
+                                    TextField(NSLocalizedString("name_placeholder", comment: ""), text: $dosageAmount)
                                         .multilineTextAlignment(.trailing)
                                         .foregroundColor(.textSecondary)
                                         .keyboardType(.numberPad)
@@ -149,7 +149,7 @@ struct AddMedicationFormView: View {
                                     .padding(.leading, 60)
                                 
                                 // 剂量单位
-                                formRow(title: "剂量单位") {
+                                formRow(title: NSLocalizedString("dosage_unit_label", comment: "")) {
                                     Menu {
                                         ForEach(dosageUnits, id: \.self) { unit in
                                             Button(action: {
@@ -178,7 +178,7 @@ struct AddMedicationFormView: View {
                                     .padding(.leading, 60)
                                 
                                 // 用药时机
-                                formRow(title: "用药时机") {
+                                formRow(title: NSLocalizedString("usage_timing_label", comment: "")) {
                                     Menu {
                                         ForEach(usageTimings, id: \.self) { timing in
                                             Button(action: {
@@ -219,7 +219,7 @@ struct AddMedicationFormView: View {
                             .padding(.bottom, 16)
                             
                             // 药物用途
-                            sectionHeader(title: "药物用途")
+                            sectionHeader(title: NSLocalizedString("medication_purpose", comment: ""))
                             
                             VStack(spacing: 0) {
                                 TextEditor(text: $medicationUsage)
@@ -232,8 +232,8 @@ struct AddMedicationFormView: View {
                                     .overlay(
                                         Group {
                                             if medicationUsage.isEmpty {
-                                                Text("请输入药物用途（如：抗血小板聚集，预防心血管事件）")
-                                                    .font(.system(size: 15))
+                                                Text(NSLocalizedString("medication_purpose_placeholder", comment: ""))
+                                                    .font(.appBody())
                                                     .foregroundColor(.textTertiary)
                                                     .padding(.horizontal, 16)
                                                     .padding(.top, 20)
@@ -247,17 +247,17 @@ struct AddMedicationFormView: View {
                             .padding(.bottom, 16)
                             
                             // 库存信息
-                            sectionHeader(title: "库存信息")
+                            sectionHeader(title: NSLocalizedString("inventory_info", comment: ""))
                             
                             VStack(spacing: 12) {
                                 HStack {
-                                    Text("库存")
-                                        .font(.system(size: 16))
+                                    Text(NSLocalizedString("inventory_label", comment: ""))
+                                        .font(.appBody())
                                         .foregroundColor(.textPrimary)
                                     
                                     Spacer()
                                     
-                                    TextField("请输入", text: $inventory)
+                                    TextField(NSLocalizedString("name_placeholder", comment: ""), text: $inventory)
                                         .multilineTextAlignment(.trailing)
                                         .foregroundColor(.textSecondary)
                                         .keyboardType(.numberPad)
@@ -312,8 +312,8 @@ struct AddMedicationFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("添加药品")
-                        .font(.system(size: 17, weight: .semibold))
+                    Text(NSLocalizedString("add_medication_title", comment: ""))
+                        .font(.appSubheadline())
                         .foregroundColor(.textPrimary)
                 }
                 
@@ -432,7 +432,7 @@ struct AddMedicationFormView: View {
             frequency = .onceDaily // 默认每天一次，可以根据需求调整
         }
         
-        // 设置默认提醒时间（设置未来30天的每日提醒）
+        // 设置默认提醒时间（只设置今天的一次提醒时间作为模板）
         let calendar = Calendar.current
         var reminderTimes: [Date] = []
         
@@ -448,16 +448,15 @@ struct AddMedicationFormView: View {
             hourOfDay = 22 // 晚上10点
         }
         
-        // 为未来30天设置每日提醒
-        for dayOffset in 0..<30 {
-            if let reminderDate = calendar.date(
-                byAdding: .day,
-                value: dayOffset,
-                to: calendar.startOfDay(for: Date())
-            ) {
-                let reminderTime = reminderDate.addingTimeInterval(Double(hourOfDay) * 3600)
-                reminderTimes.append(reminderTime)
-            }
+        // 只创建一个今天的提醒时间作为模板
+        // getTodayMedications()会自动将这个时间应用到每一天
+        if let reminderDate = calendar.date(
+            bySettingHour: hourOfDay,
+            minute: 0,
+            second: 0,
+            of: Date()
+        ) {
+            reminderTimes.append(reminderDate)
         }
         
         // 创建用药提醒对象

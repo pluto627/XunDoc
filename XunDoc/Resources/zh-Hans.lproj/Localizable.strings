@@ -463,3 +463,271 @@
 "record_time_section" = "记录时间";
 "notes_optional_section" = "备注（可选）";
 "save_data_button" = "保存数据";
+
+// MARK: - HomeView 更多文本
+"health_assistant" = "XunDoc";
+"personal_health_center" = "个人健康管理中心";
+"pending_medications" = "待服用";
+"total_records" = "病历总数";
+"today_medications" = "今日用药";
+"medications_completed" = "今日用药已完成";
+"good_medication_habits" = "良好的用药习惯会让您更健康";
+"recent_cases" = "最近病例";
+"start_health_records" = "开始记录健康档案";
+"create_first_record" = "点击这里创建您的第一份病历";
+"easy_manage_anytime" = "轻松管理  随时查阅";
+"visit_details" = "就诊详情";
+"record_content" = "记录内容";
+"recording" = "录音";
+"examination_report" = "检查报告";
+"reports_count" = "报告 %d";
+"recordings_count" = "录音 %d";
+"minutes_format_short" = "%d分钟";
+
+// MARK: - MyView 文本
+"my" = "我的";
+"personal_center" = "个人中心";
+"settings" = "设置";
+"general_settings" = "通用设置";
+"about" = "关于";
+"thank_you_xundoc" = "感谢您使用 XunDoc";
+"your_health_assistant" = "您的健康管理小助手";
+"version_format" = "版本 %@ (%@)";
+"not_set" = "未设置";
+"phone_not_set" = "未设置手机号";
+
+// MARK: - CustomTabBar 文本
+"home" = "首页";
+"visit_records" = "就诊记录";
+"medication" = "用药";
+"mine" = "我的";
+
+// MARK: - GeneralSettingsView 文本
+"language" = "语言";
+"font_size" = "字体大小";
+"dark_mode" = "深色模式";
+"enabled" = "已开启";
+"disabled" = "已关闭";
+"data_export" = "数据导出";
+"data_backup" = "备份数据";
+"export_your_health_data" = "导出您的健康数据";
+"backup_your_health_data" = "备份您的健康数据";
+"under_development" = "待开发";
+"feature_under_development" = "功能开发中";
+"data_stored_locally" = "目前您的健康数据全部保存在本地";
+"export_feature_coming" = "数据导出功能正在开发中，敬请期待";
+"font_size_small" = "小";
+"font_size_medium" = "中";
+"font_size_large" = "大";
+
+// MARK: - AboutView 文本
+"app_name_chinese" = "寻医";
+"important_notice" = "重要提示";
+"ai_disclaimer_text" = "本应用提供的AI健康分析功能仅供参考，不能替代专业医疗建议、诊断或治疗。如有健康问题，请及时咨询专业医生，以医生的诊断和建议为准。";
+"contact_us" = "联系我们";
+"contact_email" = "联系邮箱";
+"legal_terms" = "法律条款";
+"privacy_policy" = "隐私政策";
+"privacy_policy_subtitle" = "了解我们如何保护您的隐私";
+"user_agreement" = "用户协议";
+"user_agreement_subtitle" = "查看使用条款和条件";
+"copyright_text" = "© 2025 寻医. 保留所有权利.";
+"close" = "关闭";
+"last_updated_format" = "最后更新：%@";
+"optimizing_image" = "正在优化图片...";
+
+// MARK: - PhotoDiagnosisView 更多文本
+"possible_diagnosis" = "可能的诊断";
+"symptom_analysis" = "症状分析";
+"suggestions" = "建议";
+"daily_care_tips" = "日常护理";
+"medical_attention_warning" = "建议就医";
+"consult_professional" = "请咨询专业医生获得准确诊断";
+"probability_format" = "%d%% 可能性";
+
+// MARK: - MedicationView 文本
+"medication_management" = "用药管理";
+"smart_medication_reminder" = "智能用药提醒";
+"my_medications" = "我的药物";
+"no_medications_yet" = "暂无药物";
+"add_first_medication" = "点击下方按钮添加第一个药物提醒";
+"add_new_medication" = "添加新药物";
+"quick_add_medication" = "快速添加药物提醒";
+"statistics" = "统计";
+"weekly_statistics" = "本周统计";
+"current_medications" = "当前药物";
+"daily_doses" = "每日服药次数";
+"active_medications" = "活跃药物";
+"items" = "项";
+"today_taken" = "今日已服";
+"times" = "次";
+"confirm_delete" = "确认删除";
+"confirm_delete_medication_format" = "确定要删除\"%@\"吗？此操作无法撤销。";
+"edit_medication" = "编辑用药";
+"add_medication" = "添加用药";
+"medication_name_placeholder" = "请输入药物名称";
+"dosage_placeholder" = "如：1片，10ml";
+"frequency_placeholder" = "如：每日三次";
+"reminder_times" = "提醒时间";
+"add_reminder_time" = "添加提醒时间";
+"start_date_label" = "开始日期";
+"end_date_label" = "结束日期";
+"has_end_date_toggle" = "设置结束日期";
+"notes_label" = "备注";
+"notes_placeholder" = "添加备注...";
+"medication_details" = "药物详情";
+"times_per_day" = "每日%d次";
+"edit" = "编辑";
+"mark_as_taken" = "标记为已服用";
+
+// MARK: - RecordsView 文本
+"records_title" = "就诊记录";
+"records_subtitle" = "病历与档案管理";
+"unarchived_records" = "待归档";
+"archived_records" = "就诊记录";
+"no_records_yet" = "暂无就诊记录";
+"add_first_record" = "点击右上角 + 号添加记录";
+"no_transcription" = "暂无转录内容";
+"confirm_delete_record" = "确定要删除这条就诊记录吗？此操作无法撤销。";
+"search_placeholder" = "搜索医院、科室、症状...";
+
+// MARK: - ProfileEditView 文本
+"name_label" = "姓名";
+"name_placeholder" = "输入姓名";
+"phone_label" = "手机号";
+"phone_placeholder" = "输入手机号";
+"age_label" = "年龄";
+"age_placeholder" = "输入年龄";
+"age_unit" = "岁";
+"height_label" = "身高";
+"height_placeholder" = "输入身高";
+"height_unit" = "cm";
+"weight_label" = "体重";
+"weight_placeholder" = "输入体重";
+"weight_unit" = "kg";
+"gender_label" = "性别";
+"gender_male" = "男";
+"gender_female" = "女";
+"gender_placeholder" = "请选择";
+"blood_type_label" = "血型";
+"blood_type_placeholder" = "请选择";
+"emergency_contact_label" = "紧急联系人";
+"emergency_contact_placeholder" = "输入姓名";
+"emergency_phone_label" = "紧急联系电话";
+"emergency_phone_placeholder" = "输入电话";
+"allergies_label" = "过敏史";
+"allergies_placeholder" = "输入过敏史";
+"medical_history_label" = "病史";
+"medical_history_placeholder" = "输入病史";
+
+// MARK: - AddCaseStepView 文本
+"hospital_info_section" = "医院信息";
+"hospital_name_placeholder" = "请输入医院名称";
+"visit_info_section" = "就诊信息";
+"department_label" = "科室";
+"visit_date_label" = "就诊日期";
+"symptoms_description_section" = "症状描述";
+"symptoms_label" = "症状";
+"symptoms_placeholder" = "请描述症状";
+"voice_input" = "语音输入";
+"recording" = "录音中...";
+"tap_to_stop" = "点击停止";
+"diagnosis_label" = "诊断";
+"diagnosis_placeholder" = "请输入诊断";
+"treatment_label" = "治疗方案";
+"treatment_placeholder" = "请输入治疗方案";
+"prescription_label" = "处方";
+"prescription_placeholder" = "请输入处方";
+
+// MARK: - QuickAddPanelView 文本
+"add_content" = "添加内容";
+"recording_title" = "录音记录";
+"recording_description" = "医生诊断录音";
+"add_report_title" = "添加报告";
+"add_report_description" = "上传报告单照片";
+"medication_reminder_title" = "用药提醒";
+"medication_reminder_description" = "添加用药信息";
+
+// MARK: - SearchBar 文本
+"search_placeholder" = "搜索医院、科室、日期...";
+
+// MARK: - 科室名称
+"dept_internal" = "内科";
+"dept_surgery" = "外科";
+"dept_pediatrics" = "儿科";
+"dept_gynecology" = "妇科";
+"dept_orthopedics" = "骨科";
+"dept_ophthalmology" = "眼科";
+"dept_ent" = "耳鼻喉科";
+"dept_dermatology" = "皮肤科";
+"dept_neurology" = "神经科";
+"dept_cardiology" = "心血管内科";
+"dept_respiratory" = "呼吸内科";
+"dept_gastroenterology" = "消化内科";
+"dept_urology" = "泌尿科";
+"dept_oncology" = "肿瘤科";
+"dept_stomatology" = "口腔科";
+"dept_tcm" = "中医科";
+"dept_other" = "其他";
+"custom_department_prompt" = "请输入科室名称";
+"custom_department_placeholder" = "如：疼痛科、康复科等";
+
+// MARK: - 药物详情卡片
+"medication_spec" = "规格/剂量";
+"medication_frequency" = "服用频率";
+"medication_time" = "服用时间";
+"medication_form" = "剂型";
+"medication_usage" = "药物用途";
+"medication_instructions" = "服用说明";
+
+// MARK: - ProfileEditView 文本
+"basic_info" = "基本信息";
+"chronic_diseases" = "基础病/慢性病";
+"medical_history_title" = "既往病史";
+"no_chronic_diseases" = "暂无慢性病记录";
+"medical_history_placeholder_hint" = "点击输入既往病史，如手术史、过敏史等...";
+"add_chronic_disease" = "添加慢性病";
+"disease_name" = "疾病名称";
+
+// MARK: - 录音记录弹窗
+"audio_recording_title" = "录音记录";
+"recording_label" = "录音标题";
+"recording_title_placeholder" = "请输入录音标题（可选）";
+"ready_to_record" = "准备就绪";
+"start_recording" = "开始录音";
+"stop_recording" = "停止录音";
+"continue_recording" = "继续";
+"pause_recording" = "暂停";
+
+// MARK: - 添加报告弹窗
+"add_report" = "添加报告";
+"tap_to_upload_report" = "点击上传报告照片";
+"support_multiple_photos" = "支持批量选择多张照片";
+"save_reports_format" = "保存 %d 张报告";
+
+// MARK: - 添加药品表单
+"add_medication_title" = "添加药品";
+"medication_basic_info" = "基本信息";
+"medication_name_label" = "名称";
+"medication_type_label" = "类型";
+"dosage_info" = "剂量信息";
+"dosage_amount_label" = "用药剂量";
+"dosage_unit_label" = "剂量单位";
+"usage_timing_label" = "用药时机";
+"medication_purpose" = "药物用途";
+"medication_purpose_placeholder" = "请输入药物用途（如：抗血小板聚集，预防心血管事件）";
+"inventory_info" = "库存信息";
+"inventory_label" = "库存";
+"remaining_quantity" = "剩余数量";
+
+// MARK: - 病例详情页面
+"case_info" = "病例信息";
+"diagnosis_result" = "诊断结果";
+"treatment_plan" = "治疗方案";
+"attachments" = "附件";
+"image_attachments" = "图片附件";
+"visit_date_label_full" = "就诊日期";
+"diagnosis_label" = "诊断";
+"attachment_number_format" = "附件 %d";
+"tap_to_view_detail" = "点击查看详细内容";
+"check_report_format" = "检查报告 - %d张";

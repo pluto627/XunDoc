@@ -36,11 +36,11 @@ struct AddCaseStepView: View {
                 VStack(spacing: 24) {
                     // 医院信息区域
                     VStack(alignment: .leading, spacing: 16) {
-                        SectionHeader(title: "医院信息", icon: "building.2.fill")
+                        SectionHeader(title: NSLocalizedString("hospital_info_section", comment: ""), icon: "building.2.fill")
                         
                         HStack(spacing: 12) {
-                            TextField("请输入医院名称", text: $hospitalName)
-                                .font(.system(size: 16))
+                            TextField(NSLocalizedString("hospital_name_placeholder", comment: ""), text: $hospitalName)
+                                .font(.appBody())
                                 .foregroundColor(.textPrimary)
                                 .padding(.vertical, 16)
                                 .padding(.horizontal, 20)
@@ -65,12 +65,12 @@ struct AddCaseStepView: View {
                     
                     // 科室和日期区域
                     VStack(alignment: .leading, spacing: 16) {
-                        SectionHeader(title: "就诊信息", icon: "calendar.badge.clock")
+                        SectionHeader(title: NSLocalizedString("visit_info_section", comment: ""), icon: "calendar.badge.clock")
                         
                         // 科室选择
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("科室")
-                                .font(.system(size: 15, weight: .semibold))
+                            Text(NSLocalizedString("department_label", comment: ""))
+                                .font(.appSubheadline())
                                 .foregroundColor(.textPrimary)
                             
                             DepartmentGridSelector(selectedDepartment: $department)
@@ -78,8 +78,8 @@ struct AddCaseStepView: View {
                         
                         // 就诊日期
                         HStack(spacing: 12) {
-                            Text("就诊日期")
-                                .font(.system(size: 15, weight: .semibold))
+                            Text(NSLocalizedString("visit_date_label", comment: ""))
+                                .font(.appSubheadline())
                                 .foregroundColor(.textPrimary)
                             
                             Spacer()
@@ -99,11 +99,11 @@ struct AddCaseStepView: View {
                     
                     // 症状描述区域
                     VStack(alignment: .leading, spacing: 16) {
-                        SectionHeader(title: "症状描述", icon: "heart.text.square.fill")
+                        SectionHeader(title: NSLocalizedString("symptoms_description_section", comment: ""), icon: "heart.text.square.fill")
                         
                         VStack(spacing: 12) {
                             TextEditor(text: $symptoms)
-                                .font(.system(size: 15))
+                                .font(.appBody())
                                 .foregroundColor(.textPrimary)
                                 .frame(height: 150)
                                 .padding(12)
@@ -112,8 +112,8 @@ struct AddCaseStepView: View {
                                 .overlay(
                                     Group {
                                         if symptoms.isEmpty {
-                                            Text("请描述您的症状，如：头痛、发热、咳嗽等")
-                                                .font(.system(size: 15))
+                                            Text(NSLocalizedString("symptoms_placeholder", comment: ""))
+                                                .font(.appBody())
                                                 .foregroundColor(.textSecondary)
                                                 .padding(.leading, 16)
                                                 .padding(.top, 20)
@@ -129,8 +129,8 @@ struct AddCaseStepView: View {
                                     ProgressView()
                                         .scaleEffect(0.8)
                                     
-                                    Text("正在听...")
-                                        .font(.system(size: 13))
+                                    Text(NSLocalizedString("recording", comment: ""))
+                                        .font(.appCaption())
                                         .foregroundColor(.accentPrimary)
                                 }
                                 .padding(.vertical, 8)
@@ -143,9 +143,9 @@ struct AddCaseStepView: View {
                                 Button(action: toggleRecording) {
                                     HStack(spacing: 8) {
                                         Image(systemName: isRecording ? "stop.circle.fill" : "mic.fill")
-                                            .font(.system(size: 16))
-                                        Text(isRecording ? "停止录音" : "语音输入")
-                                            .font(.system(size: 15, weight: .medium))
+                                            .font(.appBody())
+                                        Text(isRecording ? NSLocalizedString("tap_to_stop", comment: "") : NSLocalizedString("voice_input", comment: ""))
+                                            .font(.appSubheadline())
                                     }
                                     .foregroundColor(isRecording ? .errorColor : .accentPrimary)
                                     .frame(maxWidth: .infinity)
@@ -401,24 +401,55 @@ struct DepartmentGridSelector: View {
     @Binding var selectedDepartment: String
     @State private var showCustomInput = false
     @State private var customDepartment = ""
+    @StateObject private var languageManager = LanguageManager.shared
     
-    let departments = ["内科", "外科", "儿科", "妇科", "骨科", "眼科", "耳鼻喉科", "皮肤科", "神经科", "心血管内科", "呼吸内科", "消化内科", "泌尿科", "肿瘤科", "口腔科", "中医科", "其他"]
+    // 科室映射
+    struct Department {
+        let key: String
+        let zhName: String
+        
+        var localizedName: String {
+            NSLocalizedString(key, comment: "")
+        }
+    }
+    
+    let departments: [Department] = [
+        Department(key: "dept_internal", zhName: "内科"),
+        Department(key: "dept_surgery", zhName: "外科"),
+        Department(key: "dept_pediatrics", zhName: "儿科"),
+        Department(key: "dept_gynecology", zhName: "妇科"),
+        Department(key: "dept_orthopedics", zhName: "骨科"),
+        Department(key: "dept_ophthalmology", zhName: "眼科"),
+        Department(key: "dept_ent", zhName: "耳鼻喉科"),
+        Department(key: "dept_dermatology", zhName: "皮肤科"),
+        Department(key: "dept_neurology", zhName: "神经科"),
+        Department(key: "dept_cardiology", zhName: "心血管内科"),
+        Department(key: "dept_respiratory", zhName: "呼吸内科"),
+        Department(key: "dept_gastroenterology", zhName: "消化内科"),
+        Department(key: "dept_urology", zhName: "泌尿科"),
+        Department(key: "dept_oncology", zhName: "肿瘤科"),
+        Department(key: "dept_stomatology", zhName: "口腔科"),
+        Department(key: "dept_tcm", zhName: "中医科"),
+        Department(key: "dept_other", zhName: "其他")
+    ]
     
     // 判断是否是预设科室
     private var isPresetDepartment: Bool {
-        departments.contains(selectedDepartment)
+        departments.contains(where: { $0.zhName == selectedDepartment || $0.localizedName == selectedDepartment })
+    }
+    
+    // 根据语言决定列数：中文3列，英文2列
+    private var gridColumns: [GridItem] {
+        let columnCount = languageManager.currentLanguage == .chinese ? 3 : 2
+        return Array(repeating: GridItem(.flexible()), count: columnCount)
     }
     
     var body: some View {
         VStack(spacing: 12) {
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 10) {
-                ForEach(departments, id: \.self) { dept in
+            LazyVGrid(columns: gridColumns, spacing: 10) {
+                ForEach(departments, id: \.zhName) { dept in
                     Button(action: {
-                        if dept == "其他" {
+                        if dept.zhName == "其他" {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                 showCustomInput = true
                                 if !isPresetDepartment && !selectedDepartment.isEmpty {
@@ -427,23 +458,21 @@ struct DepartmentGridSelector: View {
                             }
                         } else {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedDepartment = dept
+                                selectedDepartment = dept.zhName
                                 showCustomInput = false
                             }
                         }
                     }) {
-                        Text(dept)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? .white : .textPrimary)
+                        Text(dept.localizedName)
+                            .font(.appCaption())
+                            .foregroundColor((selectedDepartment == dept.zhName || (dept.zhName == "其他" && showCustomInput)) ? .white : .textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.secondaryBackgroundColor)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke((selectedDepartment == dept || (dept == "其他" && showCustomInput)) ? Color.accentPrimary : Color.clear, lineWidth: 2)
+                                    .fill((selectedDepartment == dept.zhName || (dept.zhName == "其他" && showCustomInput)) ? Color.accentPrimary : Color.secondaryBackgroundColor)
                             )
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -453,11 +482,11 @@ struct DepartmentGridSelector: View {
             // 自定义科室输入框
             if showCustomInput {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("请输入科室名称")
-                        .font(.system(size: 13, weight: .medium))
+                    Text(NSLocalizedString("custom_department_prompt", comment: ""))
+                        .font(.appCaption())
                         .foregroundColor(.textSecondary)
                     
-                    TextField("如：疼痛科、康复科等", text: $customDepartment)
+                    TextField(NSLocalizedString("custom_department_placeholder", comment: ""), text: $customDepartment)
                         .font(.system(size: 15))
                         .foregroundColor(.textPrimary)
                         .padding(.vertical, 14)

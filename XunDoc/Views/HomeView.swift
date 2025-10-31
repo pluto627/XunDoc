@@ -55,14 +55,14 @@ struct HomeHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("健康助手")
+                Text(NSLocalizedString("health_assistant", comment: ""))
                     .font(.appTitle()) // 使用衬线字体，更优雅
                     .foregroundColor(.textPrimary)
                     .fadeIn(delay: 0.1)
                 
                 HStack(spacing: 8) {
                     PulsingDot(color: .accentPrimary)
-                    Text("个人健康管理中心")
+                    Text(NSLocalizedString("personal_health_center", comment: ""))
                         .font(.appCaption())
                         .foregroundColor(.textSecondary)
                 }
@@ -94,13 +94,13 @@ struct OverviewSection: View {
             HStack(spacing: 12) {
                 OverviewCard(
                     icon: "pills.fill",
-                    label: "待服用",
+                    label: NSLocalizedString("pending_medications", comment: ""),
                     value: pendingMedicationsCount
                 )
                 
                 OverviewCard(
                     icon: "doc.text.fill",
-                    label: "病历总数",
+                    label: NSLocalizedString("total_records", comment: ""),
                     value: totalRecordsCount
                 )
             }
@@ -178,8 +178,8 @@ struct TodayMedicationSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("今日用药")
-                    .font(.system(size: 20, weight: .bold, design: .default))
+                Text(NSLocalizedString("today_medications", comment: ""))
+                    .font(.appHeadline())
                     .foregroundColor(.textPrimary)
                 
                 Spacer()
@@ -188,10 +188,10 @@ struct TodayMedicationSection: View {
                     showingMedicationView = true
                 }) {
                     HStack(spacing: 4) {
-                        Text("查看全部")
-                            .font(.system(size: 14, weight: .medium))
+                        Text(NSLocalizedString("view_all", comment: ""))
+                            .font(.appCaption())
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.appSmall())
                     }
                     .foregroundColor(.accentPrimary)
                 }
@@ -220,11 +220,11 @@ struct TodayMedicationSection: View {
                     .shadow(color: Color.successColor.opacity(0.2), radius: 10, x: 0, y: 5)
                     
                     VStack(spacing: 8) {
-                        Text("今日用药已完成")
-                            .font(.system(size: 18, weight: .semibold))
+                        Text(NSLocalizedString("medications_completed", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                         
-                        Text("良好的用药习惯会让您更健康")
+                        Text(NSLocalizedString("good_medication_habits", comment: ""))
                             .font(.appCaption())
                             .foregroundColor(.textSecondary)
                     }
@@ -382,8 +382,8 @@ struct RecentRecordsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("最近病例")
-                    .font(.system(size: 20, weight: .bold, design: .default))
+                Text(NSLocalizedString("recent_cases", comment: ""))
+                    .font(.appHeadline())
                     .foregroundColor(.textPrimary)
                 
                 Spacer()
@@ -392,10 +392,10 @@ struct RecentRecordsSection: View {
                     showingHealthRecords = true
                 }) {
                     HStack(spacing: 4) {
-                        Text("查看全部")
-                            .font(.system(size: 14, weight: .medium))
+                        Text(NSLocalizedString("view_all", comment: ""))
+                            .font(.appCaption())
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.appSmall())
                     }
                     .foregroundColor(.accentPrimary)
                 }
@@ -424,22 +424,22 @@ struct RecentRecordsSection: View {
                     .shadow(color: Color.accentPrimary.opacity(0.15), radius: 12, x: 0, y: 6)
                     
                     VStack(spacing: 8) {
-                        Text("开始记录健康档案")
-                            .font(.system(size: 18, weight: .semibold))
+                        Text(NSLocalizedString("start_health_records", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                         
-                        Text("点击这里创建您的第一份病历")
+                        Text(NSLocalizedString("create_first_record", comment: ""))
                             .font(.appCaption())
                             .foregroundColor(.textSecondary)
                     }
                     
                     HStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 14))
+                            .font(.appCaption())
                             .foregroundColor(.successColor)
                         
-                        Text("轻松管理  随时查阅")
-                            .font(.system(size: 13))
+                        Text(NSLocalizedString("easy_manage_anytime", comment: ""))
+                            .font(.appSmall())
                             .foregroundColor(.textTertiary)
                     }
                 }
@@ -479,11 +479,13 @@ struct RealCaseFileCard: View {
         var parts: [String] = []
         
         if !record.audioRecordings.isEmpty {
-            parts.append("录音 \(record.audioRecordings.count)")
+            let format = NSLocalizedString("recordings_count", comment: "")
+            parts.append(String(format: format, record.audioRecordings.count))
         }
         
         if !record.attachments.isEmpty {
-            parts.append("报告 \(record.attachments.count)")
+            let format = NSLocalizedString("reports_count", comment: "")
+            parts.append(String(format: format, record.attachments.count))
         }
         
         return parts.joined(separator: " · ")
@@ -642,8 +644,8 @@ struct RecordDetailViewWrapper: View {
                         
                         // 记录内容
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("记录内容")
-                                .font(.system(size: 18, weight: .semibold))
+                            Text(NSLocalizedString("record_content", comment: ""))
+                                .font(.appSubheadline())
                                 .foregroundColor(.textPrimary)
                             
                             // 录音记录
@@ -656,14 +658,14 @@ struct RecordDetailViewWrapper: View {
                                                 .foregroundColor(.textSecondary)
                                                 .frame(width: 16, height: 16)
                                             
-                                            Text(audio.title ?? "录音")
-                                                .font(.system(size: 14))
+                                            Text(audio.title ?? NSLocalizedString("recording", comment: ""))
+                                                .font(.appCaption())
                                                 .foregroundColor(.textSecondary)
                                             
                                             Spacer()
                                             
-                                            Text("\(Int(audio.duration / 60))分钟")
-                                                .font(.system(size: 12))
+                                            Text(String(format: NSLocalizedString("minutes_format_short", comment: ""), Int(audio.duration / 60)))
+                                                .font(.appSmall())
                                                 .foregroundColor(.textTertiary)
                                         }
                                         .padding(12)
@@ -681,8 +683,8 @@ struct RecordDetailViewWrapper: View {
                                         .foregroundColor(.textSecondary)
                                         .frame(width: 16, height: 16)
                                     
-                                    Text("检查报告 - \(record.attachments.count)张")
-                                        .font(.system(size: 14))
+                                    Text(String(format: NSLocalizedString("reports_count", comment: ""), record.attachments.count))
+                                        .font(.appCaption())
                                         .foregroundColor(.textSecondary)
                                 }
                                 .padding(12)
@@ -797,8 +799,8 @@ struct StaticRecordDetailView: View {
                             .foregroundColor(.textPrimary)
                     }
                     
-                    Text("就诊详情")
-                        .font(.system(size: 20, weight: .semibold))
+                    Text(NSLocalizedString("visit_details", comment: ""))
+                        .font(.appHeadline())
                         .foregroundColor(.textPrimary)
                     
                     Spacer()
@@ -813,7 +815,7 @@ struct StaticRecordDetailView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Text(department)
-                                    .font(.system(size: 14))
+                                    .font(.appCaption())
                                     .foregroundColor(.blue)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
@@ -823,12 +825,12 @@ struct StaticRecordDetailView: View {
                                 Spacer()
                                 
                                 Text(date)
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.gray)
+                                    .font(.appCaption())
+                                    .foregroundColor(.textSecondary)
                             }
                             
                             Text(hospital)
-                                .font(.system(size: 22, weight: .bold))
+                                .font(.appTitle())
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
@@ -838,8 +840,8 @@ struct StaticRecordDetailView: View {
                         
                         // 记录项目
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("记录内容")
-                                .font(.system(size: 18, weight: .semibold))
+                            Text(NSLocalizedString("record_content", comment: ""))
+                                .font(.appSubheadline())
                                 .foregroundColor(.textPrimary)
                             
                             VStack(spacing: 8) {

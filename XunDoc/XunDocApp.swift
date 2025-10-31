@@ -23,28 +23,32 @@ struct XunDocApp: App {
 struct RootView: View {
     @State private var showLaunchScreen = true
     @AppStorage("isDarkMode") private var isDarkMode = false
-    @AppStorage("appFontSize") private var fontSizeString = "中"
+    @AppStorage("appFontSize") private var fontSizeString = AppFontSize.medium.rawValue
+    
+    private var currentFontSize: AppFontSize {
+        AppFontSize.allCases.first(where: { $0.rawValue == fontSizeString }) ?? .medium
+    }
     
     private var fontScale: CGFloat {
-        switch fontSizeString {
-        case "小": return 0.9
-        case "大": return 1.15
-        default: return 1.0
-        }
+        currentFontSize.scale
     }
     
     var body: some View {
         Group {
             if showLaunchScreen {
                 LaunchScreenView(isActive: $showLaunchScreen)
+                    .fontScale(fontScale)
             } else {
                 ContentView()
-                    .environment(\.sizeCategory, fontScale > 1.0 ? .extraLarge : (fontScale < 1.0 ? .small : .medium))
+                    .fontScale(fontScale)
             }
         }
         .preferredColorScheme(isDarkMode ? .dark : .light)
         .onChange(of: showLaunchScreen) { oldValue, newValue in
             print("📱 showLaunchScreen 状态改变: \(oldValue) -> \(newValue)")
+        }
+        .onChange(of: fontSizeString) { oldValue, newValue in
+            print("📱 字体大小改变: \(oldValue) -> \(newValue), scale: \(fontScale)")
         }
     }
 }

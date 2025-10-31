@@ -97,8 +97,8 @@ struct PhotoDiagnosisView: View {
                                 .scaleEffect(1.5)
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             
-                            Text("正在优化图片...")
-                                .font(.system(size: 16, weight: .medium))
+                            Text(NSLocalizedString("optimizing_image", comment: ""))
+                                .font(.appSubheadline())
                                 .foregroundColor(.white)
                         }
                         .padding(32)
@@ -180,7 +180,7 @@ struct PhotoDiagnosisView: View {
                 VStack(spacing: 20) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.cardBackground)
+                            .fill(Color.cardBackgroundColor)
                             .frame(height: 200)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
@@ -238,7 +238,7 @@ struct PhotoDiagnosisView: View {
             }
         }
         .padding()
-        .background(Color.appBackground)
+        .background(Color.appBackgroundColor)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 5)
     }
@@ -248,8 +248,8 @@ struct PhotoDiagnosisView: View {
     private func SymptomsSection() -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(NSLocalizedString("symptom_optional_section", comment: ""))
-                .font(.headline)
-                .foregroundColor(.primary)
+                .font(.appSubheadline())
+                .foregroundColor(.textPrimary)
             
             // 添加症状输入框
             HStack {
@@ -276,7 +276,7 @@ struct PhotoDiagnosisView: View {
             }
         }
         .padding()
-        .background(Color.appBackground)
+        .background(Color.appBackgroundColor)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 5)
     }
@@ -286,13 +286,13 @@ struct PhotoDiagnosisView: View {
     private func AdditionalNotesSection() -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(NSLocalizedString("additional_notes_section", comment: ""))
-                .font(.headline)
-                .foregroundColor(.primary)
+                .font(.appSubheadline())
+                .foregroundColor(.textPrimary)
             
             TextEditor(text: $additionalNotes)
                 .frame(height: 100)
                 .padding(8)
-                .background(Color.cardBackground)
+                .background(Color.cardBackgroundColor)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -300,7 +300,7 @@ struct PhotoDiagnosisView: View {
                 )
         }
         .padding()
-        .background(Color.appBackground)
+        .background(Color.appBackgroundColor)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 5)
     }

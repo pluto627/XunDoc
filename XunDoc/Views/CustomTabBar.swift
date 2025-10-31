@@ -39,7 +39,7 @@ struct CustomTabBar: View {
                             // 首页
                             TabBarButton(
                                 icon: selectedTab == 0 ? "house.fill" : "house",
-                                label: "首页",
+                                label: NSLocalizedString("home", comment: ""),
                                 isSelected: selectedTab == 0,
                                 action: { selectedTab = 0 }
                             )
@@ -48,7 +48,7 @@ struct CustomTabBar: View {
                             // 就诊记录
                             TabBarButton(
                                 icon: selectedTab == 1 ? "book.fill" : "book",
-                                label: "就诊记录",
+                                label: NSLocalizedString("visit_records", comment: ""),
                                 isSelected: selectedTab == 1,
                                 action: { selectedTab = 1 }
                             )
@@ -94,7 +94,7 @@ struct CustomTabBar: View {
                             // 用药
                             TabBarButton(
                                 icon: selectedTab == 2 ? "pills.fill" : "pills",
-                                label: "用药",
+                                label: NSLocalizedString("medication", comment: ""),
                                 isSelected: selectedTab == 2,
                                 action: { selectedTab = 2 }
                             )
@@ -103,7 +103,7 @@ struct CustomTabBar: View {
                             // 我的
                             TabBarButton(
                                 icon: selectedTab == 3 ? "person.fill" : "person",
-                                label: "我的",
+                                label: NSLocalizedString("mine", comment: ""),
                                 isSelected: selectedTab == 3,
                                 action: { selectedTab = 3 }
                             )
@@ -139,11 +139,11 @@ struct TabBarButton: View {
         }) {
             VStack(spacing: 2) {
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .font(.appHeadline())
                     .foregroundColor(isSelected ? .textPrimary : .textSecondary)
                 
                 Text(label)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.appSmall())
                     .foregroundColor(isSelected ? .textPrimary : .textSecondary)
             }
             .frame(maxWidth: .infinity)

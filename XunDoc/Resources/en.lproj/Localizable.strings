@@ -463,3 +463,271 @@
 "record_time_section" = "Record Time";
 "notes_optional_section" = "Notes (Optional)";
 "save_data_button" = "Save Data";
+
+// MARK: - HomeView Additional Text
+"health_assistant" = "XunDoc";
+"personal_health_center" = "Personal Health Management Center";
+"pending_medications" = "Pending";
+"total_records" = "Total Records";
+"today_medications" = "Today's Medications";
+"medications_completed" = "All Medications Taken Today";
+"good_medication_habits" = "Good medication habits keep you healthier";
+"recent_cases" = "Recent Cases";
+"start_health_records" = "Start Health Records";
+"create_first_record" = "Click here to create your first medical record";
+"easy_manage_anytime" = "Manage Easily  Access Anytime";
+"visit_details" = "Visit Details";
+"record_content" = "Record Content";
+"recording" = "Recording";
+"examination_report" = "Examination Report";
+"reports_count" = "%d Reports";
+"recordings_count" = "%d Recordings";
+"minutes_format_short" = "%d minutes";
+
+// MARK: - MyView Text
+"my" = "My";
+"personal_center" = "Personal Center";
+"settings" = "Settings";
+"general_settings" = "General Settings";
+"about" = "About";
+"thank_you_xundoc" = "Thank you for using XunDoc";
+"your_health_assistant" = "Your Health Management Assistant";
+"version_format" = "Version %@ (%@)";
+"not_set" = "Not Set";
+"phone_not_set" = "Phone not set";
+
+// MARK: - CustomTabBar Text
+"home" = "Home";
+"visit_records" = "Visit Records";
+"medication" = "Medication";
+"mine" = "Mine";
+
+// MARK: - GeneralSettingsView Text
+"language" = "Language";
+"font_size" = "Font Size";
+"dark_mode" = "Dark Mode";
+"enabled" = "Enabled";
+"disabled" = "Disabled";
+"data_export" = "Data Export";
+"data_backup" = "Data Backup";
+"export_your_health_data" = "Export your health data";
+"backup_your_health_data" = "Backup your health data";
+"under_development" = "Under Development";
+"feature_under_development" = "Feature Under Development";
+"data_stored_locally" = "All your health data is stored locally on your device";
+"export_feature_coming" = "Data export feature is under development, please stay tuned";
+"font_size_small" = "Small";
+"font_size_medium" = "Medium";
+"font_size_large" = "Large";
+
+// MARK: - AboutView Text
+"app_name_chinese" = "XunDoc";
+"important_notice" = "Important Notice";
+"ai_disclaimer_text" = "The AI health analysis features provided by this app are for reference only and cannot replace professional medical advice, diagnosis, or treatment. If you have any health problems, please consult a professional doctor promptly, and follow the doctor's diagnosis and recommendations.";
+"contact_us" = "Contact Us";
+"contact_email" = "Contact Email";
+"legal_terms" = "Legal Terms";
+"privacy_policy" = "Privacy Policy";
+"privacy_policy_subtitle" = "Learn how we protect your privacy";
+"user_agreement" = "User Agreement";
+"user_agreement_subtitle" = "View terms and conditions";
+"copyright_text" = "© 2025 XunDoc. All rights reserved.";
+"close" = "Close";
+"last_updated_format" = "Last updated: %@";
+"optimizing_image" = "Optimizing image...";
+
+// MARK: - PhotoDiagnosisView Additional Text
+"possible_diagnosis" = "Possible Diagnosis";
+"symptom_analysis" = "Symptom Analysis";
+"suggestions" = "Suggestions";
+"daily_care_tips" = "Daily Care";
+"medical_attention_warning" = "Medical Attention Recommended";
+"consult_professional" = "Please consult a professional doctor for accurate diagnosis";
+"probability_format" = "%d%% probability";
+
+// MARK: - MedicationView Text
+"medication_management" = "Medications";
+"smart_medication_reminder" = "Smart Medication Reminder";
+"my_medications" = "My Medications";
+"no_medications_yet" = "No Medications Yet";
+"add_first_medication" = "Tap the button below to add your first medication reminder";
+"add_new_medication" = "Add New Medication";
+"quick_add_medication" = "Quick Add Medication Reminder";
+"statistics" = "Statistics";
+"weekly_statistics" = "Weekly Stats";
+"current_medications" = "Current Meds";
+"daily_doses" = "Daily Doses";
+"active_medications" = "Active";
+"items" = "items";
+"today_taken" = "Today";
+"times" = "times";
+"confirm_delete" = "Confirm Delete";
+"confirm_delete_medication_format" = "Are you sure you want to delete \"%@\"? This action cannot be undone.";
+"edit_medication" = "Edit Medication";
+"add_medication" = "Add Medication";
+"medication_name_placeholder" = "Enter medication name";
+"dosage_placeholder" = "e.g., 1 tablet, 10ml";
+"frequency_placeholder" = "e.g., Three times daily";
+"reminder_times" = "Reminder Times";
+"add_reminder_time" = "Add Reminder Time";
+"start_date_label" = "Start Date";
+"end_date_label" = "End Date";
+"has_end_date_toggle" = "Set End Date";
+"notes_label" = "Notes";
+"notes_placeholder" = "Add notes...";
+"medication_details" = "Medication Details";
+"times_per_day" = "%d times/day";
+"edit" = "Edit";
+"mark_as_taken" = "Mark as Taken";
+
+// MARK: - RecordsView Text
+"records_title" = "Medical Records";
+"records_subtitle" = "Records & Archives Management";
+"unarchived_records" = "Unarchived";
+"archived_records" = "Medical Records";
+"no_records_yet" = "No medical records yet";
+"add_first_record" = "Tap + button to add record";
+"no_transcription" = "No transcription available";
+"confirm_delete_record" = "Are you sure you want to delete this medical record? This action cannot be undone.";
+"search_placeholder" = "Search hospital, department, symptoms...";
+
+// MARK: - ProfileEditView Text
+"name_label" = "Name";
+"name_placeholder" = "Enter name";
+"phone_label" = "Phone";
+"phone_placeholder" = "Enter phone number";
+"age_label" = "Age";
+"age_placeholder" = "Enter age";
+"age_unit" = "years";
+"height_label" = "Height";
+"height_placeholder" = "Enter height";
+"height_unit" = "cm";
+"weight_label" = "Weight";
+"weight_placeholder" = "Enter weight";
+"weight_unit" = "kg";
+"gender_label" = "Gender";
+"gender_male" = "Male";
+"gender_female" = "Female";
+"gender_placeholder" = "Select";
+"blood_type_label" = "Blood Type";
+"blood_type_placeholder" = "Select";
+"emergency_contact_label" = "Emergency Contact";
+"emergency_contact_placeholder" = "Enter name";
+"emergency_phone_label" = "Emergency Phone";
+"emergency_phone_placeholder" = "Enter phone";
+"allergies_label" = "Allergies";
+"allergies_placeholder" = "Enter allergies";
+"medical_history_label" = "Medical History";
+"medical_history_placeholder" = "Enter medical history";
+
+// MARK: - AddCaseStepView Text
+"hospital_info_section" = "Hospital Information";
+"hospital_name_placeholder" = "Enter hospital name";
+"visit_info_section" = "Visit Information";
+"department_label" = "Department";
+"visit_date_label" = "Visit Date";
+"symptoms_description_section" = "Symptoms Description";
+"symptoms_label" = "Symptoms";
+"symptoms_placeholder" = "Describe symptoms";
+"voice_input" = "Voice Input";
+"recording" = "Recording...";
+"tap_to_stop" = "Tap to stop";
+"diagnosis_label" = "Diagnosis";
+"diagnosis_placeholder" = "Enter diagnosis";
+"treatment_label" = "Treatment Plan";
+"treatment_placeholder" = "Enter treatment plan";
+"prescription_label" = "Prescription";
+"prescription_placeholder" = "Enter prescription";
+
+// MARK: - QuickAddPanelView Text
+"add_content" = "Add Content";
+"recording_title" = "Audio Recording";
+"recording_description" = "Doctor's diagnosis recording";
+"add_report_title" = "Add Report";
+"add_report_description" = "Upload report photos";
+"medication_reminder_title" = "Medication Reminder";
+"medication_reminder_description" = "Add medication info";
+
+// MARK: - SearchBar Text
+"search_placeholder" = "Search hospital, department, date...";
+
+// MARK: - Department Names
+"dept_internal" = "Internal Med";
+"dept_surgery" = "Surgery";
+"dept_pediatrics" = "Pediatrics";
+"dept_gynecology" = "Gynecology";
+"dept_orthopedics" = "Orthopedics";
+"dept_ophthalmology" = "Ophthalmology";
+"dept_ent" = "ENT";
+"dept_dermatology" = "Dermatology";
+"dept_neurology" = "Neurology";
+"dept_cardiology" = "Cardiology";
+"dept_respiratory" = "Respiratory";
+"dept_gastroenterology" = "Gastro";
+"dept_urology" = "Urology";
+"dept_oncology" = "Oncology";
+"dept_stomatology" = "Dentistry";
+"dept_tcm" = "TCM";
+"dept_other" = "Other";
+"custom_department_prompt" = "Enter department name";
+"custom_department_placeholder" = "e.g., Pain Management, Rehabilitation, etc.";
+
+// MARK: - Medication Detail Card
+"medication_spec" = "Spec/Dosage";
+"medication_frequency" = "Frequency";
+"medication_time" = "Time";
+"medication_form" = "Form";
+"medication_usage" = "Usage";
+"medication_instructions" = "Instructions";
+
+// MARK: - ProfileEditView Text
+"basic_info" = "Basic Information";
+"chronic_diseases" = "Chronic Diseases";
+"medical_history_title" = "Medical History";
+"no_chronic_diseases" = "No chronic diseases recorded";
+"medical_history_placeholder_hint" = "Tap to enter medical history, such as surgical history, allergies, etc...";
+"add_chronic_disease" = "Add Chronic Disease";
+"disease_name" = "Disease Name";
+
+// MARK: - Audio Recording Dialog
+"audio_recording_title" = "Audio Recording";
+"recording_label" = "Recording Title";
+"recording_title_placeholder" = "Enter recording title (optional)";
+"ready_to_record" = "Ready";
+"start_recording" = "Start Recording";
+"stop_recording" = "Stop Recording";
+"continue_recording" = "Continue";
+"pause_recording" = "Pause";
+
+// MARK: - Add Report Dialog
+"add_report" = "Add Report";
+"tap_to_upload_report" = "Tap to Upload Report Photos";
+"support_multiple_photos" = "Supports multiple photo selection";
+"save_reports_format" = "Save %d Reports";
+
+// MARK: - Add Medication Form
+"add_medication_title" = "Add Medication";
+"medication_basic_info" = "Basic Information";
+"medication_name_label" = "Name";
+"medication_type_label" = "Type";
+"dosage_info" = "Dosage Information";
+"dosage_amount_label" = "Dosage Amount";
+"dosage_unit_label" = "Dosage Unit";
+"usage_timing_label" = "Usage Timing";
+"medication_purpose" = "Medication Purpose";
+"medication_purpose_placeholder" = "Enter medication purpose (e.g., antiplatelet aggregation, prevent cardiovascular events)";
+"inventory_info" = "Inventory Information";
+"inventory_label" = "Inventory";
+"remaining_quantity" = "Remaining";
+
+// MARK: - Case Detail Page
+"case_info" = "Case Information";
+"diagnosis_result" = "Diagnosis";
+"treatment_plan" = "Treatment Plan";
+"attachments" = "Attachments";
+"image_attachments" = "Image Attachments";
+"visit_date_label_full" = "Visit Date";
+"diagnosis_label" = "Diagnosis";
+"attachment_number_format" = "Attachment %d";
+"tap_to_view_detail" = "Tap to view details";
+"check_report_format" = "Reports - %d photos";

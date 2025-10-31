@@ -146,53 +146,158 @@ extension View {
     }
 }
 
+// MARK: - 字体大小枚举
+enum AppFontSize: String, CaseIterable {
+    case small = "font_size_small"
+    case medium = "font_size_medium"
+    case large = "font_size_large"
+    
+    var scale: CGFloat {
+        switch self {
+        case .small: return 0.9
+        case .medium: return 1.0
+        case .large: return 1.15
+        }
+    }
+    
+    var localizedName: String {
+        NSLocalizedString(self.rawValue, comment: "")
+    }
+}
+
+// MARK: - 字体大小环境键
+struct FontScaleKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 1.0
+}
+
+extension EnvironmentValues {
+    var fontScale: CGFloat {
+        get { self[FontScaleKey.self] }
+        set { self[FontScaleKey.self] = newValue }
+    }
+}
+
+extension View {
+    func fontScale(_ scale: CGFloat) -> some View {
+        environment(\.fontScale, scale)
+    }
+}
+
+// MARK: - 字体样式枚举
+enum AppFontStyle {
+    case title
+    case largeTitle
+    case headline
+    case subheadline
+    case body
+    case caption
+    case small
+    case largeNumber
+    case label
+    
+    func baseSize() -> CGFloat {
+        switch self {
+        case .title: return 32
+        case .largeTitle: return 38
+        case .headline: return 20
+        case .subheadline: return 17
+        case .body: return 16
+        case .caption: return 14
+        case .small: return 12
+        case .largeNumber: return 42
+        case .label: return 11
+        }
+    }
+    
+    func weight() -> Font.Weight {
+        switch self {
+        case .title, .largeTitle: return .bold
+        case .headline, .label: return .semibold
+        case .subheadline, .small: return .medium
+        case .body, .caption: return .regular
+        case .largeNumber: return .bold
+        }
+    }
+    
+    func design() -> Font.Design {
+        switch self {
+        case .title, .largeTitle: return .serif
+        default: return .rounded
+        }
+    }
+    
+    func toFont(scale: CGFloat = 1.0) -> Font {
+        let font = Font.system(size: baseSize() * scale, weight: weight(), design: design())
+        if self == .largeNumber {
+            return font.monospacedDigit()
+        }
+        return font
+    }
+}
+
 // MARK: - 字体系统 - 独特的排版层次
 // 使用 SF Rounded 创造温暖友好的感觉，配合优雅的衬线字体 New York 作为标题
 extension Font {
     // 主标题 - 使用 New York 衬线字体，更专业优雅
     static func appTitle() -> Font {
-        .system(size: 32, weight: .bold, design: .serif)
+        AppFontStyle.title.toFont()
     }
     
     // 大标题 - 用于特殊强调
     static func appLargeTitle() -> Font {
-        .system(size: 38, weight: .heavy, design: .serif)
+        AppFontStyle.largeTitle.toFont()
     }
     
     // 小节标题 - 使用圆润字体
     static func appHeadline() -> Font {
-        .system(size: 20, weight: .semibold, design: .rounded)
+        AppFontStyle.headline.toFont()
     }
     
     // 副标题
     static func appSubheadline() -> Font {
-        .system(size: 17, weight: .medium, design: .rounded)
+        AppFontStyle.subheadline.toFont()
     }
     
     // 正文 - 易读的圆润字体
     static func appBody() -> Font {
-        .system(size: 16, weight: .regular, design: .rounded)
+        AppFontStyle.body.toFont()
     }
     
     // 说明文字
     static func appCaption() -> Font {
-        .system(size: 14, weight: .regular, design: .rounded)
+        AppFontStyle.caption.toFont()
     }
     
     // 小字
     static func appSmall() -> Font {
-        .system(size: 12, weight: .medium, design: .rounded)
+        AppFontStyle.small.toFont()
     }
     
     // 数字显示 - 使用等宽字体
     static func appLargeNumber() -> Font {
-        .system(size: 42, weight: .bold, design: .rounded)
-            .monospacedDigit()
+        AppFontStyle.largeNumber.toFont()
     }
     
     // 标签文字 - 全大写小字
     static func appLabel() -> Font {
-        .system(size: 11, weight: .semibold, design: .rounded)
+        AppFontStyle.label.toFont()
+    }
+}
+
+// MARK: - 缩放字体视图修饰符
+struct ScaledAppFont: ViewModifier {
+    @Environment(\.fontScale) var scale
+    let style: AppFontStyle
+    
+    func body(content: Content) -> some View {
+        content
+            .font(style.toFont(scale: scale))
+    }
+}
+
+extension View {
+    func appFont(_ style: AppFontStyle) -> some View {
+        modifier(ScaledAppFont(style: style))
     }
 }
 

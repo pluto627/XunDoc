@@ -36,7 +36,7 @@ struct MyView: View {
                         // 设置
                         VStack(alignment: .leading, spacing: 12) {
                             // 节标题
-                            Text("设置")
+                            Text(NSLocalizedString("settings", comment: ""))
                                 .font(.appLabel())
                                 .foregroundColor(.textSecondary)
                                 .textCase(.uppercase)
@@ -50,7 +50,7 @@ struct MyView: View {
                                 MenuItemCard(
                                     icon: "gearshape.fill",
                                     iconColor: .accentSecondary,
-                                    title: "通用设置"
+                                    title: NSLocalizedString("general_settings", comment: "")
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -62,7 +62,7 @@ struct MyView: View {
                                 MenuItemCard(
                                     icon: "info.circle.fill",
                                     iconColor: .accentTertiary,
-                                    title: "关于"
+                                    title: NSLocalizedString("about", comment: "")
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -105,11 +105,11 @@ struct MyView: View {
                         
                         // 问候语
                         VStack(spacing: 6) {
-                            Text("感谢您使用 XunDoc")
+                            Text(NSLocalizedString("thank_you_xundoc", comment: ""))
                                 .font(.appSubheadline())
                                 .foregroundColor(.textPrimary)
                             
-                            Text("您的健康管理小助手")
+                            Text(NSLocalizedString("your_health_assistant", comment: ""))
                                 .font(.appCaption())
                                 .foregroundColor(.textSecondary)
                         }
@@ -117,7 +117,7 @@ struct MyView: View {
                         // 版本号
                         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
                            let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-                            Text("版本 \(version) (\(build))")
+                            Text(String(format: NSLocalizedString("version_format", comment: ""), version, build))
                                 .font(.appSmall())
                                 .foregroundColor(.textTertiary)
                                 .padding(.top, 4)
@@ -139,14 +139,14 @@ struct MyHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("我的")
+                Text(NSLocalizedString("my", comment: ""))
                     .font(.appTitle())
                     .foregroundColor(.textPrimary)
                     .fadeIn(delay: 0.1)
                 
                 HStack(spacing: 8) {
                     PulsingDot(color: .accentPrimary)
-                    Text("个人中心")
+                    Text(NSLocalizedString("personal_center", comment: ""))
                         .font(.appCaption())
                         .foregroundColor(.textSecondary)
                 }
@@ -168,7 +168,7 @@ struct MyProfileCard: View {
         if !name.isEmpty {
             return name
         } else {
-            return "未设置"
+            return NSLocalizedString("not_set", comment: "")
         }
     }
     
@@ -182,7 +182,7 @@ struct MyProfileCard: View {
             }
             return phoneNumber
         } else {
-            return "未设置手机号"
+            return NSLocalizedString("phone_not_set", comment: "")
         }
     }
     

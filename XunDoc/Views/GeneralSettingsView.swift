@@ -7,21 +7,6 @@
 
 import SwiftUI
 
-// MARK: - 字体大小枚举
-enum AppFontSize: String, CaseIterable {
-    case small = "小"
-    case medium = "中"
-    case large = "大"
-    
-    var scale: CGFloat {
-        switch self {
-        case .small: return 0.9
-        case .medium: return 1.0
-        case .large: return 1.15
-        }
-    }
-}
-
 struct GeneralSettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var languageManager = LanguageManager.shared
@@ -47,19 +32,19 @@ struct GeneralSettingsView: View {
             .padding(.top, 24)
             .padding(.bottom, 40)
         }
-        .background(Color.appBackground)
-        .navigationTitle("通用设置")
+        .background(Color.appBackgroundColor)
+        .navigationTitle(NSLocalizedString("general_settings", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .alert("待开发", isPresented: $showBackupAlert) {
-            Button("确定", role: .cancel) { }
+        .alert(NSLocalizedString("under_development", comment: ""), isPresented: $showBackupAlert) {
+            Button(NSLocalizedString("ok", comment: ""), role: .cancel) { }
         } message: {
-            Text("目前您的健康数据全部保存在本地")
+            Text(NSLocalizedString("data_stored_locally", comment: ""))
         }
-        .alert("功能开发中", isPresented: $showExportAlert) {
-            Button("确定", role: .cancel) { }
+        .alert(NSLocalizedString("feature_under_development", comment: ""), isPresented: $showExportAlert) {
+            Button(NSLocalizedString("ok", comment: ""), role: .cancel) { }
         } message: {
-            Text("数据导出功能正在开发中，敬请期待")
+            Text(NSLocalizedString("export_feature_coming", comment: ""))
         }
     }
     
@@ -69,7 +54,7 @@ struct GeneralSettingsView: View {
         SettingToggleCard(
             icon: "globe",
             iconColor: .blue,
-            title: "语言",
+            title: NSLocalizedString("language", comment: ""),
             subtitle: languageManager.currentLanguage.displayName
         ) {
             languageMenu
@@ -104,8 +89,8 @@ struct GeneralSettingsView: View {
         SettingToggleCard(
             icon: "textformat.size",
             iconColor: .purple,
-            title: "字体大小",
-            subtitle: currentFontSize.rawValue
+            title: NSLocalizedString("font_size", comment: ""),
+            subtitle: currentFontSize.localizedName
         ) {
             fontSizePicker
         }
@@ -114,7 +99,7 @@ struct GeneralSettingsView: View {
     private var fontSizePicker: some View {
         Picker("", selection: $fontSizeString) {
             ForEach(AppFontSize.allCases, id: \.rawValue) { size in
-                Text(size.rawValue).tag(size.rawValue)
+                Text(size.localizedName).tag(size.rawValue)
             }
         }
         .pickerStyle(.segmented)
@@ -125,8 +110,8 @@ struct GeneralSettingsView: View {
         SettingToggleCard(
             icon: "moon.fill",
             iconColor: .indigo,
-            title: "深色模式",
-            subtitle: isDarkMode ? "已开启" : "已关闭"
+            title: NSLocalizedString("dark_mode", comment: ""),
+            subtitle: isDarkMode ? NSLocalizedString("enabled", comment: "") : NSLocalizedString("disabled", comment: "")
         ) {
             Toggle("", isOn: $isDarkMode)
                 .labelsHidden()
@@ -138,8 +123,8 @@ struct GeneralSettingsView: View {
         SettingButtonCard(
             icon: "square.and.arrow.up",
             iconColor: .orange,
-            title: "数据导出",
-            subtitle: "导出您的健康数据"
+            title: NSLocalizedString("data_export", comment: ""),
+            subtitle: NSLocalizedString("export_your_health_data", comment: "")
         ) {
             exportHealthData()
         }
@@ -149,8 +134,8 @@ struct GeneralSettingsView: View {
         SettingButtonCard(
             icon: "arrow.down.doc.fill",
             iconColor: .green,
-            title: "备份数据",
-            subtitle: "备份您的健康数据"
+            title: NSLocalizedString("data_backup", comment: ""),
+            subtitle: NSLocalizedString("backup_your_health_data", comment: "")
         ) {
             showBackupAlert = true
         }
@@ -200,11 +185,11 @@ struct SettingToggleCard<Content: View>: View {
             // 文字
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.appSubheadline())
                     .foregroundColor(.textPrimary)
                 
                 Text(subtitle)
-                    .font(.system(size: 13))
+                    .font(.appSmall())
                     .foregroundColor(.textSecondary)
             }
             
@@ -214,7 +199,7 @@ struct SettingToggleCard<Content: View>: View {
             control
         }
         .padding(20)
-        .background(Color.cardBackground)
+        .background(Color.cardBackgroundColor)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 2)
     }
@@ -245,11 +230,11 @@ struct SettingButtonCard: View {
                 // 文字
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.appSubheadline())
                         .foregroundColor(.textPrimary)
                     
                     Text(subtitle)
-                        .font(.system(size: 13))
+                        .font(.appSmall())
                         .foregroundColor(.textSecondary)
                 }
                 
@@ -257,11 +242,11 @@ struct SettingButtonCard: View {
                 
                 // 箭头
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.appCaption())
                     .foregroundColor(.textSecondary.opacity(0.5))
             }
             .padding(20)
-            .background(Color.cardBackground)
+            .background(Color.cardBackgroundColor)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 2)
         }

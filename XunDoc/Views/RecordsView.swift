@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Vision
+import UIKit
 
 struct RecordsView: View {
     @EnvironmentObject var healthDataManager: HealthDataManager
@@ -105,8 +106,8 @@ struct RecordsView: View {
                     if !unarchivedRecords.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("待归档")
-                                    .font(.system(size: 14, weight: .semibold))
+                                Text(NSLocalizedString("unarchived_records", comment: ""))
+                                    .font(.appCaption())
                                     .foregroundColor(.textSecondary)
                                     .textCase(.uppercase)
                                     .tracking(0.05)
@@ -134,8 +135,8 @@ struct RecordsView: View {
                     // 已归档记录
                     if !archivedRecords.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("就诊记录")
-                                .font(.system(size: 14, weight: .semibold))
+                            Text(NSLocalizedString("archived_records", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(.textSecondary)
                                 .textCase(.uppercase)
                                 .tracking(0.05)
@@ -156,12 +157,12 @@ struct RecordsView: View {
                                 .font(.system(size: 48))
                                 .foregroundColor(.textSecondary.opacity(0.5))
                             
-                            Text("暂无就诊记录")
-                                .font(.system(size: 16))
+                            Text(NSLocalizedString("no_records_yet", comment: ""))
+                                .font(.appBody())
                                 .foregroundColor(.textSecondary)
                             
-                            Text("点击右上角 + 号添加记录")
-                                .font(.system(size: 14))
+                            Text(NSLocalizedString("add_first_record", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(.textSecondary.opacity(0.7))
                         }
                         .frame(maxWidth: .infinity)
@@ -187,12 +188,12 @@ struct RecordsHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("就诊记录")
-                    .font(.system(size: 28, weight: .semibold))
+                Text(NSLocalizedString("records_title", comment: ""))
+                    .font(.appTitle())
                     .foregroundColor(.textPrimary)
                 
-                Text("病历与档案管理")
-                    .font(.system(size: 13))
+                Text(NSLocalizedString("records_subtitle", comment: ""))
+                    .font(.appCaption())
                     .foregroundColor(.textSecondary)
             }
             
@@ -232,8 +233,8 @@ struct SearchBar: View {
                 .font(.system(size: 20))
                 .foregroundColor(.textSecondary)
             
-            TextField("搜索医院、科室、日期...", text: $searchText)
-                .font(.system(size: 14))
+            TextField(NSLocalizedString("search_placeholder", comment: ""), text: $searchText)
+                .font(.appCaption())
                 .foregroundColor(.textPrimary)
         }
         .padding(12)
@@ -268,12 +269,12 @@ struct RecordCardView: View {
         
         // 添加附件
         if !record.attachments.isEmpty {
-            itemList.append(CaseItem(icon: "doc.fill", text: "检查报告 - \(record.attachments.count)张"))
+            itemList.append(CaseItem(icon: "doc.fill", text: String(format: NSLocalizedString("check_report_format", comment: ""), record.attachments.count)))
         }
         
         // 添加诊断
         if let diagnosis = record.diagnosis, !diagnosis.isEmpty {
-            itemList.append(CaseItem(icon: "stethoscope", text: "诊断: \(diagnosis)"))
+            itemList.append(CaseItem(icon: "stethoscope", text: "\(NSLocalizedString("diagnosis_label", comment: "")): \(diagnosis)"))
         }
         
         // 如果没有任何内容，显示症状
@@ -770,8 +771,8 @@ struct AddCaseView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("就诊日期 *")
-                                .font(.system(size: 14, weight: .medium))
+                            Text("\(NSLocalizedString("visit_date_label_full", comment: "")) *")
+                                .font(.appCaption())
                                 .foregroundColor(Color(red: 55/255, green: 53/255, blue: 47/255))
                             
                             DatePicker("", selection: $visitDate, displayedComponents: .date)
@@ -804,8 +805,8 @@ struct AddCaseView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("诊断结果")
-                                .font(.system(size: 14, weight: .medium))
+                            Text(NSLocalizedString("diagnosis_result", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(Color(red: 55/255, green: 53/255, blue: 47/255))
                             
                             TextEditor(text: $diagnosis)
@@ -817,8 +818,8 @@ struct AddCaseView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("治疗方案")
-                                .font(.system(size: 14, weight: .medium))
+                            Text(NSLocalizedString("treatment_plan", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(Color(red: 55/255, green: 53/255, blue: 47/255))
                             
                             TextEditor(text: $treatment)
@@ -847,8 +848,8 @@ struct AddCaseView: View {
                     
                     // 附件
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("附件")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text(NSLocalizedString("attachments", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(Color(red: 55/255, green: 53/255, blue: 47/255))
                         
                         Button(action: {
@@ -991,7 +992,7 @@ struct CaseDetailView: View {
                         // 病例基本信息
                         RecordDetailSection(
                             icon: "doc.text",
-                            title: "病例信息"
+                            title: NSLocalizedString("case_info", comment: "")
                         ) {
                             EmptyView()
                         }
@@ -999,7 +1000,7 @@ struct CaseDetailView: View {
                         // 录音记录
                         RecordDetailSection(
                             icon: "mic",
-                            title: "录音记录"
+                            title: NSLocalizedString("audio_recording_title", comment: "")
                         ) {
                             AudioPlayerView(
                                 title: "张医生诊断录音",
@@ -1322,6 +1323,8 @@ struct RecordDetailView: View {
     @State private var showExcelViewer = false
     @State private var showImageViewer = false
     @State private var selectedImageData: Data?
+    @State private var showAttachmentDetail = false
+    @State private var selectedAttachmentData: Data?
     
     // 编辑状态的字段
     @State private var editedSymptoms: String = ""
@@ -1462,7 +1465,7 @@ struct RecordDetailView: View {
                         }
                         
                         // 诊断
-                        RecordDetailSection(icon: "stethoscope", title: "诊断") {
+                        RecordDetailSection(icon: "stethoscope", title: NSLocalizedString("diagnosis_label", comment: "")) {
                             if isEditMode {
                                 TextEditor(text: $editedDiagnosis)
                                     .font(.system(size: 15))
@@ -1487,7 +1490,7 @@ struct RecordDetailView: View {
                         }
                         
                         // 治疗方案
-                        RecordDetailSection(icon: "cross.case", title: "治疗方案") {
+                        RecordDetailSection(icon: "cross.case", title: NSLocalizedString("treatment_plan", comment: "")) {
                             if isEditMode {
                                 TextEditor(text: $editedTreatment)
                                     .font(.system(size: 15))
@@ -1532,7 +1535,7 @@ struct RecordDetailView: View {
                         
                         // 录音记录（含转文本）
                         if !record.audioRecordings.isEmpty {
-                            RecordDetailSection(icon: "mic", title: "录音记录") {
+                            RecordDetailSection(icon: "mic", title: NSLocalizedString("audio_recording_title", comment: "")) {
                                 VStack(spacing: 12) {
                                     ForEach(record.audioRecordings) { audio in
                                         AudioRecordingCard(
@@ -1550,14 +1553,31 @@ struct RecordDetailView: View {
                             }
                         }
                         
-                        // 附件（图片）- 缩小显示 + AI分析
-                        if !record.attachments.isEmpty {
-                            RecordDetailSection(icon: "photo", title: "图片附件") {
+                        // 附件（图片）- 竖排列表显示
+                        if !record.attachments.isEmpty && record.isArchived {
+                            RecordDetailSection(icon: "photo", title: NSLocalizedString("image_attachments", comment: "")) {
+                                VStack(spacing: 12) {
+                                    ForEach(Array(record.attachments.enumerated()), id: \.offset) { index, imageData in
+                                        AttachmentRowCard(
+                                            imageData: imageData,
+                                            index: index,
+                                            onTap: {
+                                                print("📎 点击附件 \(index + 1)，图片数据大小: \(imageData.count)")
+                                                selectedAttachmentData = imageData
+                                                showAttachmentDetail = true
+                                                print("📎 Sheet状态: \(showAttachmentDetail), 数据已设置: \(selectedAttachmentData != nil)")
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        } else if !record.attachments.isEmpty {
+                            // 未归档记录仍然使用网格显示
+                            RecordDetailSection(icon: "photo", title: NSLocalizedString("image_attachments", comment: "")) {
                                 VStack(spacing: 12) {
                                     LazyVGrid(columns: [
                                         GridItem(.flexible(), spacing: 8),
-                                        GridItem(.flexible(), spacing: 8),
-                                        GridItem(.flexible(), spacing: 8)  // 改为3列，图片更小
+                                        GridItem(.flexible(), spacing: 8)
                                     ], spacing: 8) {
                                         ForEach(Array(record.attachments.enumerated()), id: \.offset) { index, imageData in
                                             Button(action: {
@@ -1568,7 +1588,7 @@ struct RecordDetailView: View {
                                                     Image(uiImage: image)
                                                         .resizable()
                                                         .scaledToFill()
-                                                        .frame(height: 100)  // 从150降到100
+                                                        .frame(height: 100)
                                                         .clipped()
                                                         .cornerRadius(8)
                                                 } else {
@@ -1641,6 +1661,26 @@ struct RecordDetailView: View {
         .sheet(isPresented: $showImageViewer) {
             if let imageData = selectedImageData, let image = UIImage(data: imageData) {
                 ImageDetailView(image: image)
+            }
+        }
+        .sheet(isPresented: $showAttachmentDetail) {
+            if let imageData = selectedAttachmentData {
+                NavigationView {
+                    AttachmentDetailView(imageData: imageData)
+                        .onAppear {
+                            print("📱 AttachmentDetailView 已显示，图片数据大小: \(imageData.count)")
+                        }
+                }
+            } else {
+                // 调试用：如果数据为空，显示错误信息
+                VStack {
+                    Text("错误：无法加载图片数据")
+                        .foregroundColor(.red)
+                    Button("关闭") {
+                        showAttachmentDetail = false
+                    }
+                }
+                .padding()
             }
         }
     }
@@ -2115,8 +2155,8 @@ struct AudioRecordingCard: View {
                             .lineSpacing(4)
                             .textSelection(.enabled)
                     } else {
-                        Text("暂无转录内容")
-                            .font(.system(size: 14))
+                        Text(NSLocalizedString("no_transcription", comment: ""))
+                            .font(.appCaption())
                             .foregroundColor(.textTertiary)
                             .italic()
                     }
@@ -2331,7 +2371,7 @@ struct SwipeableRecordCard: View {
                 deleteRecord()
             }
         } message: {
-            Text("确定要删除这条就诊记录吗？此操作无法撤销。")
+            Text(NSLocalizedString("confirm_delete_record", comment: ""))
         }
     }
     
@@ -2339,5 +2379,525 @@ struct SwipeableRecordCard: View {
         withAnimation {
             healthDataManager.deleteHealthRecord(record)
         }
+    }
+}
+
+// MARK: - Attachment Row Card (附件列表项)
+struct AttachmentRowCard: View {
+    let imageData: Data
+    let index: Int
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                // 左边：小图片
+                if let image = UIImage(data: imageData) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipped()
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.dividerColor, lineWidth: 0.5)
+                        )
+                } else {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(Color.secondaryBackgroundColor)
+                            .frame(width: 60, height: 60)
+                        
+                        Image(systemName: "photo")
+                            .font(.system(size: 20))
+                            .foregroundColor(.textSecondary)
+                    }
+                }
+                
+                // 中间：档案信息
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(format: NSLocalizedString("attachment_number_format", comment: ""), index + 1))
+                        .font(.appSubheadline())
+                        .foregroundColor(.textPrimary)
+                    
+                    Text(NSLocalizedString("tap_to_view_detail", comment: ""))
+                        .font(.appSmall())
+                        .foregroundColor(.textSecondary)
+                }
+                
+                Spacer()
+                
+                // 右边：查看详细档案按钮
+                HStack(spacing: 6) {
+                    Text("查看详细档案")
+                        .font(.system(size: 13, weight: .medium))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12))
+                }
+                .foregroundColor(.accentPrimary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color.accentPrimary.opacity(0.1))
+                )
+            }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.cardBackgroundColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.dividerColor, lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Attachment Detail View (附件详情视图)
+struct AttachmentDetailView: View {
+    let imageData: Data
+    @Environment(\.dismiss) var dismiss
+    @State private var ocrText: String = ""
+    @State private var isLoadingOCR = true
+    @State private var displayMode: DisplayMode = .text // 显示模式：文本或表格
+    
+    enum DisplayMode {
+        case text
+        case table
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.appBackgroundColor.ignoresSafeArea()
+            
+            if isLoadingOCR {
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Text("正在识别图片内容...")
+                        .font(.system(size: 14))
+                        .foregroundColor(.textSecondary)
+                }
+            } else {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // OCR识别结果区域 - 放在最上面
+                        if !ocrText.isEmpty && !ocrText.contains("未识别") && !ocrText.contains("失败") && !ocrText.contains("无法") {
+                            // 有识别内容，显示切换按钮和内容
+                            VStack(spacing: 16) {
+                                // 切换显示模式
+                                HStack(spacing: 12) {
+                                    Button(action: {
+                                        displayMode = .text
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "text.alignleft")
+                                            Text("文本")
+                                        }
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(displayMode == .text ? .white : .accentPrimary)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(displayMode == .text ? Color.accentPrimary : Color.accentPrimary.opacity(0.1))
+                                        )
+                                    }
+                                    
+                                    Button(action: {
+                                        displayMode = .table
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "tablecells")
+                                            Text("表格")
+                                        }
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(displayMode == .table ? .white : .accentPrimary)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(displayMode == .table ? Color.accentPrimary : Color.accentPrimary.opacity(0.1))
+                                        )
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                
+                                // 内容显示
+                                if displayMode == .table && isTableContent(ocrText) {
+                                    // 表格显示
+                                    TableContentView(text: ocrText)
+                                } else {
+                                    // 文本/结论显示
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        Text("识别内容")
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundColor(.textPrimary)
+                                        
+                                        Text(ocrText)
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.textPrimary)
+                                            .lineSpacing(6)
+                                            .textSelection(.enabled)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(16)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(Color.secondaryBackgroundColor)
+                                            )
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                        } else if !ocrText.isEmpty {
+                            // 显示错误或提示信息
+                            VStack(spacing: 12) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(.orange.opacity(0.7))
+                                
+                                Text(ocrText)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.textSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(4)
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.orange.opacity(0.05))
+                            )
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                        } else {
+                            // 未识别到文字
+                            VStack(spacing: 12) {
+                                Image(systemName: "doc.text.magnifyingglass")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(.textSecondary.opacity(0.5))
+                                
+                                Text("图片中未识别到文字")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                                
+                                Text("请确保照片清晰，或者内容可能不是文字形式")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.textTertiary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.secondaryBackgroundColor)
+                            )
+                            .padding(.horizontal, 20)
+                            .padding(.top, 10)
+                        }
+                        
+                        // 原始图片预览 - 缩小并放在下面
+                        if let image = UIImage(data: imageData) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("原始图片")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.textSecondary)
+                                    .padding(.horizontal, 20)
+                                
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxHeight: 250) // 限制最大高度，缩小图片
+                                    .cornerRadius(8)
+                                    .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 1)
+                                    .padding(.horizontal, 20)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 20)
+                }
+            }
+        }
+        .navigationTitle("详细档案")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("关闭") {
+                    dismiss()
+                }
+                .foregroundColor(.accentPrimary)
+            }
+        }
+        .onAppear {
+            extractTextFromImage()
+        }
+    }
+    
+    // 提取图片文字
+    private func extractTextFromImage() {
+        print("🔍 开始OCR识别，图片数据大小: \(imageData.count)")
+        
+        guard let image = UIImage(data: imageData) else {
+            print("❌ 无法创建UIImage")
+            DispatchQueue.main.async {
+                self.isLoadingOCR = false
+                self.ocrText = "无法加载图片数据"
+            }
+            return
+        }
+        
+        guard let cgImage = image.cgImage else {
+            print("❌ 无法获取CGImage")
+            DispatchQueue.main.async {
+                self.isLoadingOCR = false
+                self.ocrText = "无法处理图片"
+            }
+            return
+        }
+        
+        isLoadingOCR = true
+        ocrText = ""
+        
+        if #available(iOS 13.0, *) {
+            let request = VNRecognizeTextRequest { request, error in
+                
+                DispatchQueue.main.async {
+                    self.isLoadingOCR = false
+                    
+                    if let error = error {
+                        print("❌ OCR识别出错: \(error.localizedDescription)")
+                        self.ocrText = "OCR识别出错：\(error.localizedDescription)\n\n您仍然可以查看原始图片。"
+                        return
+                    }
+                    
+                    guard let observations = request.results as? [VNRecognizedTextObservation] else {
+                        print("⚠️ 未识别到任何文字")
+                        self.ocrText = "图片中未识别到文字，请确保照片清晰。您仍然可以查看原始图片。"
+                        return
+                    }
+                    
+                    let recognizedStrings = observations.compactMap { observation in
+                        observation.topCandidates(1).first?.string
+                    }
+                    
+                    let fullText = recognizedStrings.joined(separator: "\n")
+                    print("✅ OCR识别成功，识别到 \(recognizedStrings.count) 段文字，总长度: \(fullText.count)")
+                    
+                    if fullText.isEmpty {
+                        self.ocrText = "图片中未识别到文字，请确保照片清晰。您仍然可以查看原始图片。"
+                    } else {
+                        self.ocrText = fullText
+                        // 智能判断：如果是检验报告，自动切换到表格模式
+                        if self.isTableContent(fullText) {
+                            self.displayMode = .table
+                        }
+                    }
+                }
+            }
+            
+            request.recognitionLanguages = ["zh-Hans", "zh-Hant", "en-US"]
+            request.recognitionLevel = .accurate
+            request.usesLanguageCorrection = true
+            
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    print("🔄 执行OCR识别请求...")
+                    try handler.perform([request])
+                } catch {
+                    print("❌ 执行OCR识别时出错: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        self.isLoadingOCR = false
+                        self.ocrText = "OCR识别失败：\(error.localizedDescription)\n\n您仍然可以查看原始图片。"
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.isLoadingOCR = false
+                self.ocrText = "OCR功能需要 iOS 13.0 或更高版本"
+            }
+        }
+    }
+    
+    // 判断是否为表格内容
+    private func isTableContent(_ text: String) -> Bool {
+        let lowercaseText = text.lowercased()
+        
+        // 检查是否包含血常规关键词
+        let bloodTestKeywords = ["血常规", "white blood cell", "wbc", "红细胞", "rbc", "血红蛋白", "hgb", "血小板", "plt", "中性粒细胞", "淋巴细胞", "单核细胞"]
+        let hasBloodTest = bloodTestKeywords.contains { lowercaseText.contains($0) }
+        
+        // 检查是否包含尿常规关键词
+        let urineTestKeywords = ["尿常规", "urine", "尿蛋白", "尿糖", "白细胞", "红细胞", "尿比重", "ph值", "尿胆原", "尿酮体"]
+        let hasUrineTest = urineTestKeywords.contains { lowercaseText.contains($0) }
+        
+        // 检查是否包含生化检验关键词
+        let biochemTestKeywords = ["生化", "肝功能", "肾功能", "alt", "ast", "谷丙转氨酶", "谷草转氨酶", "肌酐", "尿素", "血糖", "glucose", "总胆固醇", "甘油三酯"]
+        let hasBiochemTest = biochemTestKeywords.contains { lowercaseText.contains($0) }
+        
+        // 检查是否包含其他检验项目关键词
+        let labTestKeywords = ["检验报告", "化验单", "检查项目", "项目", "指标", "结果", "参考值", "参考范围", "单位", "正常值", "异常", "↑", "↓"]
+        let hasLabTest = labTestKeywords.contains { text.contains($0) || lowercaseText.contains($0) }
+        
+        // 如果是检验报告，优先使用表格显示
+        if hasBloodTest || hasUrineTest || hasBiochemTest {
+            return true
+        }
+        
+        // 检查是否有表格结构特征
+        let lines = text.components(separatedBy: .newlines)
+        var structuredLineCount = 0
+        
+        for line in lines {
+            // 检查是否包含制表符
+            if line.contains("\t") {
+                structuredLineCount += 1
+                continue
+            }
+            
+            // 检查是否包含多个空格分隔的列
+            let columns = line.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+            if columns.count >= 3 {
+                structuredLineCount += 1
+            }
+        }
+        
+        // 如果有足够多的结构化行，且包含检验关键词，则认为是表格
+        if structuredLineCount >= 3 && hasLabTest {
+            return true
+        }
+        
+        return false
+    }
+}
+
+// MARK: - Table Content View (表格内容视图)
+struct TableContentView: View {
+    let text: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "tablecells.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.accentPrimary)
+                Text("检验报告")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.textPrimary)
+            }
+            
+            ScrollView(.horizontal, showsIndicators: true) {
+                VStack(alignment: .leading, spacing: 1) {
+                    // 表头
+                    if let firstLine = parseTableLines(text).first, isHeaderRow(firstLine) {
+                        TableHeaderView(columns: firstLine)
+                    }
+                    
+                    // 数据行
+                    ForEach(Array(parseTableLines(text).enumerated()), id: \.offset) { index, line in
+                        if index > 0 || !isHeaderRow(line) {
+                            TableRowView(columns: line, isEvenRow: index % 2 == 0)
+                        }
+                    }
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.secondaryBackgroundColor)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.15), lineWidth: 1)
+                )
+            }
+        }
+    }
+    
+    // 判断是否为表头行
+    private func isHeaderRow(_ columns: [String]) -> Bool {
+        let headerKeywords = ["项目", "指标", "检查项", "名称", "结果", "参考值", "单位", "范围"]
+        return columns.contains { col in
+            headerKeywords.contains { col.contains($0) }
+        }
+    }
+    
+    // 解析表格行
+    private func parseTableLines(_ text: String) -> [[String]] {
+        let lines = text.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        var tableLines: [[String]] = []
+        
+        for line in lines {
+            // 尝试用制表符分割
+            var columns = line.components(separatedBy: "\t").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            
+            // 如果没有制表符，尝试用多个空格分割
+            if columns.count < 2 {
+                let parts = line.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+                if parts.count >= 2 {
+                    columns = parts
+                } else {
+                    columns = [line]
+                }
+            }
+            
+            if !columns.isEmpty {
+                tableLines.append(columns)
+            }
+        }
+        
+        return tableLines
+    }
+}
+
+// MARK: - Table Header View (表格表头视图)
+struct TableHeaderView: View {
+    let columns: [String]
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            ForEach(Array(columns.enumerated()), id: \.offset) { index, column in
+                Text(column)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(minWidth: index == 0 ? 120 : 100, alignment: .center)
+                    .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.accentPrimary)
+    }
+}
+
+// MARK: - Table Row View (表格行视图)
+struct TableRowView: View {
+    let columns: [String]
+    let isEvenRow: Bool
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            ForEach(Array(columns.enumerated()), id: \.offset) { index, column in
+                Text(column)
+                    .font(.system(size: 13, weight: index == 0 ? .medium : .regular))
+                    .foregroundColor(hasAbnormalMarker(column) ? .red : .textPrimary)
+                    .frame(minWidth: index == 0 ? 120 : 100, alignment: .center)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(isEvenRow ? Color.gray.opacity(0.05) : Color.clear)
+    }
+    
+    // 检查是否包含异常标记
+    private func hasAbnormalMarker(_ text: String) -> Bool {
+        return text.contains("↑") || text.contains("↓") || text.contains("高") || text.contains("低") || text.lowercased().contains("abnormal")
     }
 }

@@ -36,12 +36,12 @@ struct AboutView: View {
                         )
                         .padding(.top, 20)
                     
-                    Text("寻医")
-                        .font(.system(size: 28, weight: .bold))
+                    Text(NSLocalizedString("app_name_chinese", comment: ""))
+                        .font(.appTitle())
                         .foregroundColor(.textPrimary)
                     
-                    Text("版本 \(appVersion) (\(buildNumber))")
-                        .font(.system(size: 14))
+                    Text(String(format: NSLocalizedString("version_format", comment: ""), appVersion, buildNumber))
+                        .font(.appCaption())
                         .foregroundColor(.textSecondary)
                 }
                 
@@ -50,14 +50,14 @@ struct AboutView: View {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.orange)
-                        Text("重要提示")
-                            .font(.system(size: 15, weight: .semibold))
+                        Text(NSLocalizedString("important_notice", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                         Spacer()
                     }
                     
-                    Text("本应用提供的AI健康分析功能仅供参考，不能替代专业医疗建议、诊断或治疗。如有健康问题，请及时咨询专业医生，以医生的诊断和建议为准。")
-                        .font(.system(size: 14))
+                    Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
+                        .font(.appCaption())
                         .foregroundColor(.textSecondary)
                         .lineSpacing(4)
                 }
@@ -67,23 +67,23 @@ struct AboutView: View {
                 
                 // 联系方式
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("联系我们")
-                        .font(.system(size: 13, weight: .medium))
+                    Text(NSLocalizedString("contact_us", comment: ""))
+                        .font(.appSmall())
                         .foregroundColor(.textSecondary)
                         .padding(.horizontal, 4)
                     
                     AboutItemCard(
                         icon: "envelope.fill",
                         iconColor: .blue,
-                        title: "联系邮箱",
+                        title: NSLocalizedString("contact_email", comment: ""),
                         subtitle: "plutoguogg@gmail.com"
                     )
                 }
                 
                 // 法律条款
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("法律条款")
-                        .font(.system(size: 13, weight: .medium))
+                    Text(NSLocalizedString("legal_terms", comment: ""))
+                        .font(.appSmall())
                         .foregroundColor(.textSecondary)
                         .padding(.horizontal, 4)
                     
@@ -93,8 +93,8 @@ struct AboutView: View {
                         AboutItemCard(
                             icon: "hand.raised.fill",
                             iconColor: .purple,
-                            title: "隐私政策",
-                            subtitle: "了解我们如何保护您的隐私",
+                            title: NSLocalizedString("privacy_policy", comment: ""),
+                            subtitle: NSLocalizedString("privacy_policy_subtitle", comment: ""),
                             showChevron: true
                         )
                     }
@@ -106,8 +106,8 @@ struct AboutView: View {
                         AboutItemCard(
                             icon: "doc.text.fill",
                             iconColor: .green,
-                            title: "用户协议",
-                            subtitle: "查看使用条款和条件",
+                            title: NSLocalizedString("user_agreement", comment: ""),
+                            subtitle: NSLocalizedString("user_agreement_subtitle", comment: ""),
                             showChevron: true
                         )
                     }
@@ -115,16 +115,16 @@ struct AboutView: View {
                 }
                 
                 // 版权信息
-                Text("© 2025 寻医. 保留所有权利.")
-                    .font(.system(size: 12))
+                Text(NSLocalizedString("copyright_text", comment: ""))
+                    .font(.appSmall())
                     .foregroundColor(.textTertiary)
                     .padding(.top, 8)
                     .padding(.bottom, 40)
             }
             .padding(.horizontal, 20)
         }
-        .background(Color.appBackground)
-        .navigationTitle("关于")
+        .background(Color.appBackgroundColor)
+        .navigationTitle(NSLocalizedString("about", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showPrivacyPolicy) {
             PrivacyPolicyView()
@@ -159,11 +159,11 @@ struct AboutItemCard: View {
             // 文字
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.appSubheadline())
                     .foregroundColor(.textPrimary)
                 
                 Text(subtitle)
-                    .font(.system(size: 13))
+                    .font(.appSmall())
                     .foregroundColor(.textSecondary)
                     .lineLimit(2)
             }
@@ -173,12 +173,12 @@ struct AboutItemCard: View {
             // 箭头
             if showChevron {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.appCaption())
                     .foregroundColor(.textSecondary.opacity(0.5))
             }
         }
         .padding(20)
-        .background(Color.cardBackground)
+        .background(Color.cardBackgroundColor)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 2)
     }
@@ -260,12 +260,12 @@ struct PrivacyPolicyView: View {
                 }
                 .padding(20)
             }
-            .background(Color.appBackground)
-            .navigationTitle("隐私政策")
+            .background(Color.appBackgroundColor)
+            .navigationTitle(NSLocalizedString("privacy_policy", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("关闭") {
+                    Button(NSLocalizedString("close", comment: "")) {
                         dismiss()
                     }
                 }
@@ -363,12 +363,12 @@ struct UserAgreementView: View {
                 }
                 .padding(20)
             }
-            .background(Color.appBackground)
-            .navigationTitle("用户协议")
+            .background(Color.appBackgroundColor)
+            .navigationTitle(NSLocalizedString("user_agreement", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("关闭") {
+                    Button(NSLocalizedString("close", comment: "")) {
                         dismiss()
                     }
                 }
@@ -385,11 +385,11 @@ struct PolicySection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.appSubheadline())
                 .foregroundColor(.textPrimary)
             
             Text(content)
-                .font(.system(size: 15))
+                .font(.appBody())
                 .foregroundColor(.textSecondary)
                 .lineSpacing(6)
         }

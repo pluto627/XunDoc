@@ -25,8 +25,8 @@ struct QuickAddPanelView: View {
                     .padding(.top, 12)
                 
                 HStack {
-                    Text("添加内容")
-                        .font(.system(size: 20, weight: .semibold))
+                    Text(NSLocalizedString("add_content", comment: ""))
+                        .font(.appHeadline())
                         .foregroundColor(.textPrimary)
                     
                     Spacer()
@@ -54,8 +54,8 @@ struct QuickAddPanelView: View {
             VStack(spacing: 12) {
                 ModernQuickAddCard(
                     icon: "mic",
-                    title: "录音记录",
-                    description: "医生诊断录音"
+                    title: NSLocalizedString("recording_title", comment: ""),
+                    description: NSLocalizedString("recording_description", comment: "")
                 ) {
                     showingRecording = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -65,8 +65,8 @@ struct QuickAddPanelView: View {
                 
                 ModernQuickAddCard(
                     icon: "doc.text",
-                    title: "添加报告",
-                    description: "上传报告单照片"
+                    title: NSLocalizedString("add_report_title", comment: ""),
+                    description: NSLocalizedString("add_report_description", comment: "")
                 ) {
                     showingReport = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -76,8 +76,8 @@ struct QuickAddPanelView: View {
                 
                 ModernQuickAddCard(
                     icon: "list.clipboard",
-                    title: "用药提醒",
-                    description: "添加用药信息"
+                    title: NSLocalizedString("medication_reminder_title", comment: ""),
+                    description: NSLocalizedString("medication_reminder_description", comment: "")
                 ) {
                     showingMedication = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -524,8 +524,8 @@ struct SimpleRecordingSheet: View {
             
             // 标题区域
             HStack {
-                Text("录音记录")
-                    .font(.system(size: 20, weight: .semibold))
+                Text(NSLocalizedString("audio_recording_title", comment: ""))
+                    .font(.appHeadline())
                     .foregroundColor(.textPrimary)
                 
                 Spacer()
@@ -551,12 +551,12 @@ struct SimpleRecordingSheet: View {
                 VStack(spacing: 20) {
                     // 录音标题输入 - 缩小
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("录音标题")
-                            .font(.system(size: 13, weight: .medium))
+                        Text(NSLocalizedString("recording_label", comment: ""))
+                            .font(.appCaption())
                             .foregroundColor(.textSecondary)
                         
-                        TextField("请输入录音标题（可选）", text: $recordingTitle)
-                            .font(.system(size: 14))
+                        TextField(NSLocalizedString("recording_title_placeholder", comment: ""), text: $recordingTitle)
+                            .font(.appCaption())
                             .padding(10)
                             .background(Color.secondaryBackgroundColor)
                             .cornerRadius(10)
@@ -584,8 +584,8 @@ struct SimpleRecordingSheet: View {
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.textSecondary)
                             } else {
-                                Text("准备就绪")
-                                    .font(.system(size: 14))
+                                Text(NSLocalizedString("ready_to_record", comment: ""))
+                                    .font(.appCaption())
                                     .foregroundColor(.textSecondary)
                             }
                         }
@@ -608,8 +608,8 @@ struct SimpleRecordingSheet: View {
                                         .foregroundColor(.white)
                                 }
                                 
-                                Text(isRecording ? (isPaused ? "继续" : "暂停") : "开始录音")
-                                    .font(.system(size: 12))
+                                Text(isRecording ? (isPaused ? NSLocalizedString("continue_recording", comment: "") : NSLocalizedString("pause_recording", comment: "")) : NSLocalizedString("start_recording", comment: ""))
+                                    .font(.appSmall())
                                     .foregroundColor(.textSecondary)
                             }
                         }
@@ -980,8 +980,8 @@ struct SimpleReportSheet: View {
             
             // 标题区域
             HStack {
-                Text("添加报告")
-                    .font(.system(size: 20, weight: .semibold))
+                Text(NSLocalizedString("add_report", comment: ""))
+                    .font(.appHeadline())
                     .foregroundColor(.textPrimary)
                 
                 Spacer()
@@ -1015,12 +1015,12 @@ struct SimpleReportSheet: View {
                                     .font(.system(size: 48))
                                     .foregroundColor(.textTertiary)
                                 
-                                Text("点击上传报告照片")
-                                    .font(.system(size: 17, weight: .semibold))
+                                Text(NSLocalizedString("tap_to_upload_report", comment: ""))
+                                    .font(.appSubheadline())
                                     .foregroundColor(.textPrimary)
                                 
-                                Text("支持批量选择多张照片")
-                                    .font(.system(size: 14))
+                                Text(NSLocalizedString("support_multiple_photos", comment: ""))
+                                    .font(.appCaption())
                                     .foregroundColor(.textSecondary)
                             }
                             .frame(maxWidth: .infinity)
@@ -1119,8 +1119,8 @@ struct SimpleReportSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 16))
-                        Text("保存 \(selectedImages.count) 张报告")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text(String(format: NSLocalizedString("save_reports_format", comment: ""), selectedImages.count))
+                            .font(.appSubheadline())
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)

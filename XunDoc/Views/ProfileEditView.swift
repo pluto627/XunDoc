@@ -36,8 +36,8 @@ struct ProfileEditView: View {
                             .font(.system(size: 18))
                             .foregroundColor(.accentColor)
                         
-                        Text("基本信息")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text(NSLocalizedString("basic_info", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                     }
                     .padding(.horizontal, 20)
@@ -50,8 +50,8 @@ struct ProfileEditView: View {
                             CompactInfoField(
                                 icon: "person.fill",
                                 iconColor: .purple,
-                                title: "姓名",
-                                placeholder: "输入姓名",
+                                title: NSLocalizedString("name_label", comment: ""),
+                                placeholder: NSLocalizedString("name_placeholder", comment: ""),
                                 text: Binding(
                                     get: { profileManager.userProfile.name },
                                     set: { 
@@ -65,8 +65,8 @@ struct ProfileEditView: View {
                             CompactInfoField(
                                 icon: "phone.fill",
                                 iconColor: .blue,
-                                title: "手机号",
-                                placeholder: "输入手机号",
+                                title: NSLocalizedString("phone_label", comment: ""),
+                                placeholder: NSLocalizedString("phone_placeholder", comment: ""),
                                 text: Binding(
                                     get: { profileManager.userProfile.phoneNumber },
                                     set: { 
@@ -84,8 +84,8 @@ struct ProfileEditView: View {
                             CompactInfoField(
                                 icon: "calendar",
                                 iconColor: .orange,
-                                title: "年龄",
-                                placeholder: "输入年龄",
+                                title: NSLocalizedString("age_label", comment: ""),
+                                placeholder: NSLocalizedString("age_placeholder", comment: ""),
                                 text: Binding(
                                     get: { 
                                         if let age = profileManager.userProfile.age {
@@ -104,7 +104,7 @@ struct ProfileEditView: View {
                                     }
                                 ),
                                 keyboardType: .numberPad,
-                                suffix: "岁"
+                                suffix: NSLocalizedString("age_unit", comment: "")
                             )
                             
                             // 空白占位
@@ -118,8 +118,8 @@ struct ProfileEditView: View {
                             CompactInfoField(
                                 icon: "ruler",
                                 iconColor: .green,
-                                title: "身高",
-                                placeholder: "输入身高",
+                                title: NSLocalizedString("height_label", comment: ""),
+                                placeholder: NSLocalizedString("height_placeholder", comment: ""),
                                 text: Binding(
                                     get: { 
                                         if let height = profileManager.userProfile.height {
@@ -145,8 +145,8 @@ struct ProfileEditView: View {
                             CompactInfoField(
                                 icon: "scalemass",
                                 iconColor: .purple,
-                                title: "体重",
-                                placeholder: "输入体重",
+                                title: NSLocalizedString("weight_label", comment: ""),
+                                placeholder: NSLocalizedString("weight_placeholder", comment: ""),
                                 text: Binding(
                                     get: { 
                                         if let weight = profileManager.userProfile.weight {
@@ -218,8 +218,8 @@ struct ProfileEditView: View {
                             .font(.system(size: 18))
                             .foregroundColor(.orange)
                         
-                        Text("基础病/慢性病")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text(NSLocalizedString("chronic_diseases", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                         
                         Spacer()
@@ -246,8 +246,8 @@ struct ProfileEditView: View {
                             Image(systemName: "heart.slash")
                                 .foregroundColor(.textSecondary.opacity(0.5))
                             
-                            Text("暂无慢性病记录")
-                                .font(.system(size: 14))
+                            Text(NSLocalizedString("no_chronic_diseases", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
@@ -281,8 +281,8 @@ struct ProfileEditView: View {
                             .font(.system(size: 18))
                             .foregroundColor(.blue)
                         
-                        Text("既往病史")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text(NSLocalizedString("medical_history_title", comment: ""))
+                            .font(.appSubheadline())
                             .foregroundColor(.textPrimary)
                     }
                     .padding(.horizontal, 20)
@@ -314,8 +314,8 @@ struct ProfileEditView: View {
                         }
                         
                         if profileManager.userProfile.medicalHistory.isEmpty {
-                            Text("点击输入既往病史，如手术史、过敏史等...")
-                                .font(.system(size: 14))
+                            Text(NSLocalizedString("medical_history_placeholder_hint", comment: ""))
+                                .font(.appCaption())
                                 .foregroundColor(.textSecondary.opacity(0.6))
                                 .padding(.leading, 16)
                                 .padding(.top, 20)
@@ -370,12 +370,12 @@ struct ProfileEditView: View {
                     }
                 }
         }
-        .alert("添加慢性病", isPresented: $showingAddDisease) {
-            TextField("疾病名称", text: $newDisease)
-            Button("取消", role: .cancel) {
+        .alert(NSLocalizedString("add_chronic_disease", comment: ""), isPresented: $showingAddDisease) {
+            TextField(NSLocalizedString("disease_name", comment: ""), text: $newDisease)
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {
                 newDisease = ""
             }
-            Button("添加") {
+            Button(NSLocalizedString("add", comment: "")) {
                 profileManager.addChronicDisease(newDisease)
                 newDisease = ""
             }
