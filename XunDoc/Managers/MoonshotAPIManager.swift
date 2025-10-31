@@ -11,7 +11,7 @@ import SwiftUI
 class MoonshotAPIManager: ObservableObject {
     static let shared = MoonshotAPIManager()
     
-    private let apiKey = "sk-wc9tcOA0q2ShfOjKZ91YStbbyyoMGpiegf6zq54i9kpaQtke"
+    private let apiKey = "YOUR_MOONSHOT_API_KEY_HERE"  // ⚠️ 警告：请不要在此硬编码 API Key！使用 Config.swift 文件管理
     private let baseURL = "https://api.moonshot.cn/v1"
     
     @Published var isAnalyzing = false

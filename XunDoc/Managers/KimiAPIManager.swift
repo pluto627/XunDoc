@@ -95,7 +95,7 @@ class KimiAPIManager: ObservableObject {
     @Published var conversationHistories: [AIConversationHistory] = []
     @Published var isLoading = false
     
-    private let apiKey = "sk-CE6JIOSti61TqFYhPFs6OrTS5wMtJvA8v2YsnPIw1SFgeqcu"  // 需要替换为实际的API Key
+    private let apiKey = "YOUR_KIMI_API_KEY_HERE"  // ⚠️ 警告：请不要在此硬编码 API Key！使用 Config.swift 文件管理
     private let baseURL = "https://api.moonshot.cn/v1/chat/completions"
     private let historiesKey = "ai_conversation_histories"
     
